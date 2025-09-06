@@ -1,0 +1,207 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap');
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Fallback font */
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #1a1a2e;
+    background-image: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40"%3E%3Cg fill-rule="evenodd"%3E%3Cg fill="%2316213e" fill-opacity="0.4"%3E%3Cpath d="M0 38.59l2.83-2.83 1.41 1.41L1.41 40H0v-1.41zM0 1.4l2.83 2.83 1.41-1.41L1.41 0H0v1.41zM38.59 40l-2.83-2.83 1.41-1.41L40 38.59V40h-1.41zM40 1.41l-2.83 2.83-1.41-1.41L38.59 0H40v1.41zM20 18.6l2.83-2.83 1.41 1.41L21.41 20l2.83 2.83-1.41 1.41L20 21.41l-2.83 2.83-1.41-1.41L18.59 20l-2.83-2.83 1.41-1.41L20 18.59z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');
+    color: #e0e0e0;
+}
+
+h1, h2, h3 {
+    font-family: 'Cinzel', serif;
+    font-weight: 700;
+    color: #c0a36a;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.7);
+}
+
+.container {
+    padding: 0;
+    background: none;
+    border: none;
+    backdrop-filter: none;
+}
+
+.generate-btn {
+    display: block;
+    margin: 0 auto 30px;
+    padding: 12px 25px;
+    font-family: 'Cinzel', serif;
+    font-size: 1.2em;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    background: #3a3835;
+    color: #e0e0e0;
+    border: 1px solid #111;
+    border-top-color: #6a6661;
+    border-left-color: #6a6661;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+}
+
+.generate-btn:hover {
+    background: #4f4c48;
+    color: #fff;
+    border-top-color: #c0a36a;
+    border-left-color: #c0a36a;
+}
+
+.character-sheet {
+    background-color: #2c2f33;
+    border: 1px solid #1a1c1e;
+    border-radius: 4px;
+    padding: 20px;
+    box-shadow: 0 5px 25px rgba(0,0,0,0.5);
+}
+
+.character-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    border-bottom: 1px solid #444;
+    padding-bottom: 15px;
+    margin-bottom: 15px;
+}
+
+.character-header h2 {
+    font-size: 2em;
+    margin: 0;
+    color: #e0e0e0;
+}
+
+.character-subheader {
+    display: flex;
+    gap: 20px;
+    font-size: 1.1em;
+}
+
+.subheader-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #aaa;
+}
+.subheader-item i {
+    color: #c0a36a;
+}
+
+.skills-bar {
+    display: flex;
+    justify-content: space-around;
+    background-color: #232528;
+    padding: 10px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+}
+
+.skill-item {
+    text-align: center;
+    color: #c0a36a;
+}
+.skill-item i {
+    font-size: 1.2em;
+}
+.skill-value {
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #fff;
+    margin-top: 5px;
+}
+.skill-name {
+    font-size: 0.8em;
+    color: #aaa;
+}
+
+.traits-container {
+    background-color: #232528;
+    border-radius: 4px;
+    padding: 20px;
+}
+
+.traits-container h3 {
+    margin: 0 0 15px 0;
+    font-size: 1.5em;
+    text-align: center;
+}
+
+.traits-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+}
+
+.trait-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 70px;
+    text-align: center;
+}
+
+.trait-icon {
+    width: 64px;
+    height: 64px;
+    margin: 0;
+    border-radius: 4px;
+    border: 2px solid #555;
+    box-shadow: inset 0 0 5px rgba(0,0,0,0.5);
+}
+
+.trait-name {
+    font-size: 0.8em;
+    margin-top: 5px;
+    color: #ccc;
+    font-weight: normal;
+}
+
+.build-summary {
+    margin-top: 30px;
+    padding: 15px;
+    background: #232528;
+    border-radius: 4px;
+    border: 1px solid #444;
+}
+
+.build-summary h3 {
+    text-align: center;
+    margin: 0 0 15px 0;
+}
+
+.points-breakdown {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.points-item {
+    background: #33363a;
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-size: 0.9em;
+}
+
+.positive-cost { color: #85c785; }
+.negative-cost { color: #d66e6e; }
+.zero-cost { color: #87CEEB; }
+
+.efficiency-info {
+    text-align: center;
+    margin-top: 15px;
+    font-size: 0.9em;
+    color: #888;
+}
+
+.error {
+    color: #d66e6e;
+    text-align: center;
+    padding: 20px;
+    background: rgba(214, 110, 110, 0.1);
+    border-radius: 4px;
+    border: 1px solid #d66e6e;
+}

@@ -1,0 +1,21 @@
+trait_name,skill_focus,image_link,point_cost
+Naive Appeaser,Diplomacy,https://ck3.paradoxwikis.com/images/thumb/7/7d/Trait_education_diplomacy_1.png/24px-Trait_education_diplomacy_1.png,0
+Adequate Bargainer,Diplomacy,https://ck3.paradoxwikis.com/images/thumb/b/ba/Trait_education_diplomacy_2.png/24px-Trait_education_diplomacy_2.png,20
+Charismatic Negotiator,Diplomacy,https://ck3.paradoxwikis.com/images/thumb/a/a3/Trait_education_diplomacy_3.png/24px-Trait_education_diplomacy_3.png,40
+Grey Eminence,Diplomacy,https://ck3.paradoxwikis.com/images/thumb/1/19/Trait_education_diplomacy_4.png/24px-Trait_education_diplomacy_4.png,80
+Misguided Warrior,Martial,https://ck3.paradoxwikis.com/images/thumb/8/8a/Trait_education_martial_1.png/24px-Trait_education_martial_1.png,0
+Tough Soldier,Martial,https://ck3.paradoxwikis.com/images/thumb/2/25/Trait_education_martial_2.png/24px-Trait_education_martial_2.png,20
+Skilled Tactician,Martial,https://ck3.paradoxwikis.com/images/thumb/8/8b/Trait_education_martial_3.png/24px-Trait_education_martial_3.png,40
+Brilliant Strategist,Martial,https://ck3.paradoxwikis.com/images/thumb/1/12/Trait_education_martial_4.png/24px-Trait_education_martial_4.png,80
+Indulgent Wastrel,Stewardship,https://ck3.paradoxwikis.com/images/thumb/8/89/Trait_education_stewardship_1.png/24px-Trait_education_stewardship_1.png,0
+Thrifty Clerk,Stewardship,https://ck3.paradoxwikis.com/images/thumb/7/7d/Trait_education_stewardship_2.png/24px-Trait_education_stewardship_2.png,20
+Fortune Builder,Stewardship,https://ck3.paradoxwikis.com/images/thumb/9/91/Trait_education_stewardship_3.png/24px-Trait_education_stewardship_3.png,40
+Midas Touched,Stewardship,https://ck3.paradoxwikis.com/images/thumb/8/8f/Trait_education_stewardship_4.png/24px-Trait_education_stewardship_4.png,80
+Amateurish Plotter,Intrigue,https://ck3.paradoxwikis.com/images/thumb/b/ba/Trait_education_intrigue_1.png/24px-Trait_education_intrigue_1.png,0
+Flamboyant Trickster,Intrigue,https://ck3.paradoxwikis.com/images/thumb/e/e8/Trait_education_intrigue_2.png/24px-Trait_education_intrigue_2.png,20
+Intricate Webweaver,Intrigue,https://ck3.paradoxwikis.com/images/thumb/a/ad/Trait_education_intrigue_3.png/24px-Trait_education_intrigue_3.png,40
+Elusive Shadow,Intrigue,https://ck3.paradoxwikis.com/images/thumb/1/17/Trait_education_intrigue_4.png/24px-Trait_education_intrigue_4.png,80
+Conscientious Scribe,Learning,https://ck3.paradoxwikis.com/images/thumb/b/b1/Trait_education_learning_1.png/24px-Trait_education_learning_1.png,0
+Insightful Thinker,Learning,https://ck3.paradoxwikis.com/images/thumb/3/3f/Trait_education_learning_2.png/24px-Trait_education_learning_2.png,20
+Astute Intellectual,Learning,https://ck3.paradoxwikis.com/images/thumb/5/5a/Trait_education_learning_3.png/24px-Trait_education_learning_3.png,40
+Mastermind Philosopher,Learning,https://ck3.paradoxwikis.com/images/thumb/6/6f/Trait_education_learning_4.png/24px-Trait_education_learning_4.png,80
