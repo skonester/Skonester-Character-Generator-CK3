@@ -1,0 +1,2252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CK3 History Generator</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Lato:wght@400;700&display=swap');
+        
+        :root {
+            --ck3-gold: #d4af37;
+            --ck3-dark: #1a1a2e;
+            --ck3-panel: #232528;
+            --ck3-border: #444;
+            --ck3-text: #e5e5e5;
+        }
+
+        body {
+            font-family: 'Lato', sans-serif;
+            background-color: var(--ck3-dark);
+            color: var(--ck3-text);
+            min-height: 100vh;
+            /* Subtle pattern from new.zip styles */
+            background-image: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40"%3E%3Cg fill-rule="evenodd"%3E%3Cg fill="%2316213e" fill-opacity="0.4"%3E%3Cpath d="M0 38.59l2.83-2.83 1.41 1.41L1.41 40H0v-1.41zM0 1.4l2.83 2.83 1.41-1.41L1.41 0H0v1.41zM38.59 40l-2.83-2.83 1.41-1.41L40 38.59V40h-1.41zM40 1.41l-2.83 2.83-1.41-1.41L38.59 0H..."%3E%3C/path%3E%3C/g%3E%3C/g%3E%3C/svg%3E');
+        }
+        
+        h1, h2, h3, .ck3-font, .title {
+            font-family: 'Cinzel', serif;
+        }
+
+        /* Overrides */
+        .box {
+            background-color: var(--ck3-panel);
+            border: 1px solid var(--ck3-border);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+            color: var(--ck3-text);
+        }
+
+        .label {
+            color: #a3a3a3;
+            font-size: 0.875rem;
+        }
+
+        .input, .textarea, .select select {
+            background-color: #16181c;
+            border-color: var(--ck3-border);
+            color: var(--ck3-text);
+            transition: border-color 0.2s;
+        }
+
+        .input:focus, .textarea:focus, .select select:focus {
+            border-color: var(--ck3-gold);
+            box-shadow: 0 0 0 0.125em rgba(212, 175, 55, 0.25);
+        }
+
+        .btn-gold {
+            background: linear-gradient(to bottom, #d4af37, #b4941f);
+            color: #1a1a1a !important;
+            font-weight: bold;
+            border: 1px solid #8a6d0b;
+            text-shadow: 0 1px 0 rgba(255,255,255,0.2);
+            transition: all 0.2s;
+        }
+
+        .btn-gold:hover {
+            filter: brightness(1.1);
+            transform: translateY(-1px);
+        }
+
+        .header-gold {
+            color: var(--ck3-gold);
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .section-header {
+            color: var(--ck3-gold);
+            border-bottom: 1px solid #4a4a4a;
+            padding-bottom: 0.5rem;
+            margin-bottom: 1rem;
+            font-size: 1.25rem;
+            font-weight: bold;
+        }
+
+        .output-area {
+            background-color: #111;
+            color: #48c774; 
+            font-family: monospace;
+            border: none;
+            resize: none;
+            height: 600px;
+        }
+
+        /* Trait Grid Styles */
+        .trait-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+            gap: 0.5rem;
+            max-height: 300px;
+            overflow-y: auto;
+            padding: 0.5rem;
+            background: #16181c;
+            border: 1px solid #444;
+            border-radius: 4px;
+        }
+
+        .trait-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+            transition: background 0.2s;
+            position: relative;
+        }
+
+        .trait-item:hover {
+            background: #333;
+        }
+
+        .trait-item.selected {
+            background: rgba(212, 175, 55, 0.2);
+            border: 1px solid var(--ck3-gold);
+        }
+
+        .trait-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 4px;
+        }
+
+        .trait-tooltip {
+            font-size: 0.7rem;
+            text-align: center;
+            margin-top: 2px;
+            line-height: 1.1;
+            color: #ccc;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            width: 100%;
+        }
+
+        /* Tabs */
+        .tabs.is-toggle li.is-active a {
+            background-color: var(--ck3-gold);
+            border-color: var(--ck3-gold);
+            color: #1a1a1a;
+            font-weight: bold;
+        }
+        .tabs.is-toggle a {
+            background-color: var(--ck3-panel);
+            border-color: #444;
+            color: #aaa;
+        }
+        .tabs.is-toggle a:hover {
+            background-color: #333;
+            color: #fff;
+        }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #1a1a1a; }
+        ::-webkit-scrollbar-thumb { background: #404040; border-radius: 4px; }
+    </style>
+</head>
+<body>
+
+    <section class="section pt-4">
+        <div class="container">
+            
+            <div class="has-text-centered mb-5">
+                <h1 class="title is-2 header-gold">CK3 History Generator</h1>
+                <p class="subtitle has-text-grey-light is-6">Generate historical character files compatible with Crusader Kings 3.</p>
+            </div>
+
+            <div class="columns">
+                
+                <div class="column is-one-third">
+                    
+                    <div class="box">
+                        <h2 class="section-header"><i class="fas fa-cog mr-2"></i> Settings</h2>
+                        
+                        <div class="columns is-mobile mb-2">
+                            <div class="column">
+                                <label class="label">Count</label>
+                                <input class="input" type="number" id="numChars" value="10" min="1">
+                            </div>
+                            <div class="column">
+                                <label class="label">Start Year</label>
+                                <input class="input" type="number" id="startYear" value="867">
+                            </div>
+                        </div>
+
+                        <div class="columns is-mobile mb-2">
+                            <div class="column">
+                                <label class="label" title="Years BEFORE start">Min Range</label>
+                                <input class="input" type="number" id="minDateRange" value="50">
+                            </div>
+                            <div class="column">
+                                <label class="label" title="Years AFTER start">Max Range</label>
+                                <input class="input" type="number" id="maxDateRange" value="0">
+                            </div>
+                        </div>
+
+                        <div class="columns is-mobile mb-2">
+                            <div class="column">
+                                <label class="label">Min Age</label>
+                                <input class="input" type="number" id="minAge" value="16">
+                            </div>
+                            <div class="column">
+                                <label class="label">Max Age</label>
+                                <input class="input" type="number" id="maxAge" value="87">
+                            </div>
+                        </div>
+                         <div class="field mb-4">
+                            <label class="label">Female Chance (%)</label>
+                            <input class="input" type="number" id="femalePercent" value="20" min="0" max="100">
+                        </div>
+
+                        <h2 class="section-header mt-5"><i class="fas fa-flag mr-2"></i> Culture & Names</h2>
+                        
+                        <div class="field">
+                            <label class="label">Preset Culture</label>
+                            <div class="select is-fullwidth">
+                                <select id="cultureSelect" onchange="applyCulturePreset()">
+                                    <option value="manual">Manual / Custom</option>
+                                    </select>
+                            </div>
+                        </div>
+
+                        <div class="columns is-mobile mb-2">
+                            <div class="column">
+                                <label class="label">Culture Code</label>
+                                <input class="input" type="text" id="culture" value="roman">
+                            </div>
+                            <div class="column">
+                                <label class="label">Religion Code</label>
+                                <input class="input" type="text" id="religion" value="catholic">
+                            </div>
+                        </div>
+
+                        <div class="is-flex is-justify-content-space-between is-align-items-center is-clickable mt-3" onclick="toggleSection('dataSection')">
+                            <span class="is-size-7 has-text-gold" style="color:var(--ck3-gold)">Edit Raw Name Lists</span>
+                            <span class="icon is-small has-text-grey toggle-icon" id="dataArrow"><i class="fas fa-chevron-down"></i></span>
+                        </div>
+                        <div id="dataSection" class="is-hidden mt-2">
+                            <textarea id="namesInput" class="textarea is-small" rows="6"></textarea>
+                        </div>
+
+                        <h2 class="section-header mt-5"><i class="fas fa-user-tag mr-2"></i> Easter Egg DNA</h2>
+                        <div class="field">
+                            <label class="label">Scripted Appearance</label>
+                            <div class="select is-fullwidth">
+                                <select id="dnaSelect">
+                                    <option value="">(Random Appearance)</option>
+                                    </select>
+                            </div>
+                            <p class="help">Select a pre-scripted character DNA to use for *all* generated characters.</p>
+                        </div>
+                    </div>
+
+                    <button onclick="generateCharacters()" class="button btn-gold is-fullwidth is-medium mb-4" id="generateRandomBtn">
+                        <span class="icon"><i class="fas fa-scroll"></i></span>
+                        <span>Generate History File</span>
+                    </button>
+                    
+                    <button onclick="generateBarbara()" class="button btn-gold is-fullwidth is-medium mb-4 is-hidden" id="generateBarbaraBtn">
+                        <span class="icon"><i class="fas fa-user-edit"></i></span>
+                        <span>Generate Barbara Code</span>
+                    </button>
+
+                </div>
+
+                <div class="column">
+                    
+                    <div class="box mb-4">
+                        <h2 class="section-header"><i class="fas fa-dna mr-2"></i> Trait Pool</h2>
+                        
+                        <div class="tabs is-toggle is-fullwidth is-small mb-3">
+                            <ul>
+                                <li class="is-active" onclick="switchTab(this, 'random')"><a>Random Generator</a></li>
+                                <li onclick="switchTab(this, 'barbara')"><a>Barbara Editor</a></li>
+                            </ul>
+                        </div>
+                        
+                        <div id="tab-random">
+                            <div class="field">
+                                <label class="label">Random Traits per Character</label>
+                                <input class="input" type="number" id="maxTraits" value="3" style="width: 100px;">
+                            </div>
+                            <div class="tabs is-toggle is-fullwidth is-small mb-3">
+                                <ul>
+                                    <li class="is-active" data-content-id="education" onclick="switchSubTab(this, 'education')"><a>Education</a></li>
+                                    <li data-content-id="personality" onclick="switchSubTab(this, 'personality')"><a>Personality</a></li>
+                                    <li data-content-id="congenital" onclick="switchSubTab(this, 'congenital')"><a>Congenital</a></li>
+                                    <li data-content-id="manual" onclick="switchSubTab(this, 'manual')"><a>Manual List</a></li>
+                                </ul>
+                            </div>
+
+                            <div id="subtab-education" class="trait-grid"></div>
+                            <div id="subtab-personality" class="trait-grid is-hidden"></div>
+                            <div id="subtab-congenital" class="trait-grid is-hidden"></div>
+                            
+                            <div id="subtab-manual" class="is-hidden">
+                                <textarea id="traitsInput" class="textarea is-small" rows="8" placeholder="One trait per line (e.g. strong)"></textarea>
+                                <p class="help">Traits selected in the visual grids are automatically added to the pool.</p>
+                            </div>
+                        </div>
+                        
+                        <div id="tab-barbara" class="is-hidden">
+                            <h3 class="section-header is-size-6 mt-3"><i class="fas fa-calendar-alt mr-2"></i> Events & Identity</h3>
+                            
+                            <div class="field">
+                                <label class="label is-small">Character ID / Start Date</label>
+                                <div class="select is-fullwidth is-small">
+                                    <select id="barbaraIDSelect" onchange="updateBarbaraDatesAndDynasty()">
+                                        <option value="7860867">7860867 (867 Start)</option>
+                                        <option value="7861066">7861066 (1066 Start)</option>
+                                        <option value="7861178">7861178 (1178 Start)</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="field">
+                                <label class="label is-small">Name</label>
+                                <input class="input is-small" type="text" id="barbaraName" value="Barbara">
+                            </div>
+                            
+                            <div class="columns is-mobile">
+                                <div class="column">
+                                    <label class="label is-small">Culture</label>
+                                    <input class="input is-small" type="text" id="barbaraCulture" value="greek">
+                                </div>
+                                <div class="column">
+                                    <label class="label is-small">Religion</label>
+                                    <input class="input is-small" type="text" id="barbaraReligion" value="orthodox">
+                                </div>
+                            </div>
+                            
+                            <div class="columns is-mobile">
+                                <div class="column">
+                                    <label class="label is-small">Birth Date</label>
+                                    <input class="input is-small is-static" type="text" id="barbaraBirth" value="847.1.1" readonly>
+                                </div>
+                                <div class="column">
+                                    <label class="label is-small">Death Date</label>
+                                    <input class="input is-small is-static" type="text" id="barbaraDeath" value="922.1.1" readonly>
+                                </div>
+                            </div>
+                            <div class="field">
+                                <label class="label is-small">Dynasty ID</label>
+                                <input class="input is-small is-static" type="text" id="barbaraDynasty" value="random" readonly>
+                            </div>
+                            <div class="field">
+                                <label class="label is-small">Nickname (on Death)</label>
+                                <input class="input is-small" type="text" id="barbaraNickname" value="nick_the_brilliant">
+                            </div>
+                            
+                            <h3 class="section-header is-size-6 mt-5"><i class="fas fa-file-code mr-2"></i> Custom DNA (yaseen_dna)</h3>
+                            <textarea id="barbaraCustomDNAInput" class="textarea is-small" rows="8" placeholder="Paste your custom yaseen_dna = { ... } block here, ensuring it includes the full structure: yaseen_dna = { portrait_info = { type=female genes={...} } enabled = yes }"></textarea>
+                            <p class="help">**Important:** This block should contain the full `yaseen_dna = { ... }` structure. If you only have the `genes = { ... }` section, paste it into a full template before outputting. We recommend copying the genes only here and wrapping it in the output. </p>
+                            
+                            <h3 class="section-header is-size-6 mt-5"><i class="fas fa-shield-alt mr-2"></i> Attributes</h3>
+                            <div class="columns is-mobile">
+                                <div class="column"><label class="label is-small">Martial</label><input class="input is-small" type="number" id="barbaraMartial" value="10"></div>
+                                <div class="column"><label class="label is-small">Stewardship</label><input class="input is-small" type="number" id="barbaraStewardship" value="7"></div>
+                                <div class="column"><label class="label is-small">Diplomacy</label><input class="input is-small" type="number" id="barbaraDiplomacy" value="9"></div>
+                            </div>
+                            <div class="columns is-mobile">
+                                <div class="column"><label class="label is-small">Intrigue</label><input class="input is-small" type="number" id="barbaraIntrigue" value="13"></div>
+                                <div class="column"><label class="label is-small">Prowess</label><input class="input is-small" type="number" id="barbaraProwess" value="10"></div>
+                                <div class="column"></div>
+                            </div>
+
+                            <h3 class="section-header is-size-6 mt-5"><i class="fas fa-user-tag mr-2"></i> Traits</h3>
+                            <textarea id="barbaraTraitsInput" class="textarea is-small" rows="6">compassionate
+hashishiyah
+fecund
+beauty_good_1
+education_martial_1
+violet_poet</textarea>
+                            <p class="help">One trait per line.</p>
+                            
+                        </div>
+                        </div>
+
+                    <div class="box p-0" style="overflow: hidden; display: flex; flex-direction: column; height: 500px;">
+                        <div class="p-3" style="background-color: var(--ck3-panel); border-bottom: 1px solid #444;">
+                            <div class="level is-mobile m-0">
+                                <div class="level-left">
+                                    <h2 class="title is-5 mb-0 header-gold"><i class="fas fa-code mr-2"></i> Output Code</h2>
+                                </div>
+                                <div class="level-right">
+                                    <div class="buttons are-small">
+                                        <button onclick="copyToClipboard()" class="button is-dark">
+                                            <span class="icon"><i class="fas fa-copy"></i></span>
+                                            <span>Copy</span>
+                                        </button>
+                                        <button onclick="downloadFile()" class="button is-dark">
+                                            <span class="icon"><i class="fas fa-download"></i></span>
+                                            <span>.txt</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <textarea id="outputArea" class="textarea output-area p-4" readonly placeholder="Generated character code will appear here..."></textarea>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+<script>
+// ==========================================
+// DNA DATA (Copied from yaseen_dna.txt)
+// This is used for initial structure reference, but the input box is for user custom DNA.
+// ==========================================
+const YASEEN_DNA_STRUCTURE = `yaseen_dna = {
+	portrait_info = {
+		type=female
+		genes={ 		hair_color={ 15 240 222 201 }
+ 			skin_color={ 99 112 99 112 }
+ 			eye_color={ 219 171 219 171 }
+ 			gene_chin_forward={ "chin_forward_pos" 178 "chin_forward_pos" 178 }
+ 			gene_chin_height={ "chin_height_pos" 136 "chin_height_pos" 136 }
+ 			gene_chin_width={ "chin_width_pos" 128 "chin_width_pos" 128 }
+ 			gene_eye_angle={ "eye_angle_pos" 138 "eye_angle_pos" 138 }
+ 			gene_eye_depth={ "eye_depth_neg" 92 "eye_depth_neg" 92 }
+ 			gene_eye_height={ "eye_height_neg" 116 "eye_height_neg" 116 }
+ 			gene_eye_distance={ "eye_distance_pos" 132 "eye_distance_pos" 132 }
+ 			gene_eye_shut={ "eye_shut_neg" 120 "eye_shut_neg" 120 }
+ 			gene_forehead_angle={ "forehead_angle_neg" 106 "forehead_angle_neg" 106 }
+ 			gene_forehead_brow_height={ "forehead_brow_height_neg" 91 "forehead_brow_height_neg" 91 }
+ 			gene_forehead_roundness={ "forehead_roundness_pos" 176 "forehead_roundness_pos" 176 }
+ 			gene_forehead_width={ "forehead_width_pos" 170 "forehead_width_pos" 170 }
+ 			gene_forehead_height={ "forehead_height_pos" 130 "forehead_height_pos" 130 }
+ 			gene_head_height={ "head_height_pos" 172 "head_height_pos" 172 }
+ 			gene_head_width={ "head_width_neg" 88 "head_width_neg" 88 }
+ 			gene_head_profile={ "head_profile_neg" 124 "head_profile_neg" 124 }
+ 			gene_head_top_height={ "head_top_height_pos" 138 "head_top_height_pos" 138 }
+ 			gene_head_top_width={ "head_top_width_pos" 225 "head_top_width_pos" 225 }
+ 			gene_jaw_angle={ "jaw_angle_neg" 104 "jaw_angle_neg" 104 }
+ 			gene_jaw_forward={ "jaw_forward_pos" 128 "jaw_forward_pos" 128 }
+ 			gene_jaw_height={ "jaw_height_pos" 131 "jaw_height_pos" 131 }
+ 			gene_jaw_width={ "jaw_width_pos" 144 "jaw_width_pos" 144 }
+ 			gene_mouth_corner_depth={ "mouth_corner_depth_pos" 134 "mouth_corner_depth_pos" 134 }
+ 			gene_mouth_corner_height={ "mouth_corner_height_neg" 105 "mouth_corner_height_neg" 105 }
+ 			gene_mouth_forward={ "mouth_forward_pos" 133 "mouth_forward_pos" 133 }
+ 			gene_mouth_height={ "mouth_height_pos" 142 "mouth_height_pos" 142 }
+ 			gene_mouth_width={ "mouth_width_neg" 74 "mouth_width_neg" 74 }
+ 			gene_mouth_upper_lip_size={ "mouth_upper_lip_size_pos" 132 "mouth_upper_lip_size_pos" 132 }
+ 			gene_mouth_lower_lip_size={ "mouth_lower_lip_size_pos" 135 "mouth_lower_lip_size_pos" 135 }
+ 			gene_mouth_open={ "mouth_open_pos" 149 "mouth_open_pos" 149 }
+ 			gene_neck_length={ "neck_length_neg" 117 "neck_length_neg" 117 }
+ 			gene_neck_width={ "neck_width_pos" 128 "neck_width_pos" 128 }
+ 			gene_bs_cheek_forward={ "cheek_forward_pos" 45 "cheek_forward_pos" 45 }
+ 			gene_bs_cheek_height={ "cheek_height_pos" 43 "cheek_height_pos" 43 }
+ 			gene_bs_cheek_width={ "cheek_width_neg" 44 "cheek_width_neg" 44 }
+ 			gene_bs_ear_angle={ "ear_angle_neg" 2 "ear_angle_neg" 2 }
+ 			gene_bs_ear_inner_shape={ "ear_inner_shape_pos" 15 "ear_inner_shape_pos" 15 }
+ 			gene_bs_ear_bend={ "ear_both_bend_pos" 17 "ear_both_bend_pos" 17 }
+ 			gene_bs_ear_outward={ "ear_outward_pos" 57 "ear_outward_pos" 57 }
+ 			gene_bs_ear_size={ "ear_size_pos" 109 "ear_size_pos" 109 }
+ 			gene_bs_eye_corner_depth={ "eye_corner_depth_pos" 191 "eye_corner_depth_pos" 191 }
+ 			gene_bs_eye_fold_shape={ "eye_fold_shape_pos" 76 "eye_fold_shape_pos" 76 }
+ 			gene_bs_eye_size={ "eye_size_pos" 43 "eye_size_pos" 43 }
+ 			gene_bs_eye_upper_lid_size={ "eye_upper_lid_size_pos" 126 "eye_upper_lid_size_pos" 126 }
+ 			gene_bs_forehead_brow_curve={ "forehead_brow_curve_neg" 0 "forehead_brow_curve_neg" 0 }
+ 			gene_bs_forehead_brow_forward={ "forehead_brow_forward_pos" 61 "forehead_brow_forward_pos" 61 }
+ 			gene_bs_forehead_brow_inner_height={ "forehead_brow_inner_height_pos" 103 "forehead_brow_inner_height_pos" 103 }
+ 			gene_bs_forehead_brow_outer_height={ "forehead_brow_outer_height_pos" 6 "forehead_brow_outer_height_pos" 6 }
+ 			gene_bs_forehead_brow_width={ "forehead_brow_width_neg" 42 "forehead_brow_width_neg" 42 }
+ 			gene_bs_jaw_def={ "jaw_def_neg" 71 "jaw_def_neg" 71 }
+ 			gene_bs_mouth_lower_lip_def={ "mouth_lower_lip_def_pos" 73 "mouth_lower_lip_def_pos" 73 }
+ 			gene_bs_mouth_lower_lip_full={ "mouth_lower_lip_full_neg" 10 "mouth_lower_lip_full_neg" 10 }
+ 			gene_bs_mouth_lower_lip_pad={ "mouth_lower_lip_pad_neg" 60 "mouth_lower_lip_pad_neg" 60 }
+ 			gene_bs_mouth_lower_lip_width={ "mouth_lower_lip_width_neg" 49 "mouth_lower_lip_width_neg" 49 }
+ 			gene_bs_mouth_philtrum_def={ "mouth_philtrum_def_pos" 10 "mouth_philtrum_def_pos" 10 }
+ 			gene_bs_mouth_philtrum_shape={ "mouth_philtrum_shape_pos" 3 "mouth_philtrum_shape_pos" 3 }
+ 			gene_bs_mouth_philtrum_width={ "mouth_philtrum_width_pos" 97 "mouth_philtrum_width_pos" 97 }
+ 			gene_bs_mouth_upper_lip_def={ "mouth_upper_lip_def_pos" 6 "mouth_upper_lip_def_pos" 6 }
+ 			gene_bs_mouth_upper_lip_full={ "mouth_upper_lip_full_pos" 24 "mouth_upper_lip_full_pos" 24 }
+ 			gene_bs_mouth_upper_lip_profile={ "mouth_upper_lip_profile_neg" 18 "mouth_upper_lip_profile_neg" 18 }
+ 			gene_bs_mouth_upper_lip_width={ "mouth_upper_lip_width_pos" 28 "mouth_upper_lip_width_pos" 28 }
+ 			gene_bs_nose_forward={ "nose_forward_pos" 22 "nose_forward_pos" 22 }
+ 			gene_bs_nose_height={ "nose_height_neg" 5 "nose_height_neg" 5 }
+ 			gene_bs_nose_length={ "nose_length_pos" 102 "nose_length_pos" 102 }
+ 			gene_bs_nose_nostril_height={ "nose_nostril_height_pos" 119 "nose_nostril_height_pos" 119 }
+ 			gene_bs_nose_nostril_width={ "nose_nostril_width_pos" 41 "nose_nostril_width_pos" 41 }
+ 			gene_bs_nose_profile={ "nose_profile_pos" 35 "nose_profile_pos" 35 }
+ 			gene_bs_nose_ridge_angle={ "nose_ridge_angle_neg" 5 "nose_ridge_angle_neg" 5 }
+ 			gene_bs_nose_ridge_width={ "nose_ridge_width_pos" 23 "nose_ridge_width_pos" 23 }
+ 			gene_bs_nose_size={ "nose_size_pos" 23 "nose_size_pos" 23 }
+ 			gene_bs_nose_tip_angle={ "nose_tip_angle_pos" 9 "nose_tip_angle_pos" 9 }
+ 			gene_bs_nose_tip_forward={ "nose_tip_forward_pos" 26 "nose_tip_forward_pos" 26 }
+ 			gene_bs_nose_tip_width={ "nose_tip_width_pos" 11 "nose_tip_width_pos" 11 }
+ 			face_detail_cheek_def={ "cheek_def_02" 24 "cheek_def_02" 24 }
+ 			face_detail_cheek_fat={ "cheek_fat_01_pos" 3 "cheek_fat_01_pos" 3 }
+ 			face_detail_chin_cleft={ "chin_cleft" 25 "chin_cleft" 25 }
+ 			face_detail_chin_def={ "chin_def_neg" 31 "chin_def_neg" 31 }
+ 			face_detail_eye_lower_lid_def={ "eye_lower_lid_def" 129 "eye_lower_lid_def" 129 }
+ 			face_detail_eye_socket={ "eye_socket_01" 25 "eye_socket_01" 25 }
+ 			face_detail_nasolabial={ "nasolabial_01" 15 "nasolabial_01" 15 }
+ 			face_detail_nose_ridge_def={ "nose_ridge_def_pos" 2 "nose_ridge_def_pos" 2 }
+ 			face_detail_nose_tip_def={ "nose_tip_def" 0 "nose_tip_def" 0 }
+ 			face_detail_temple_def={ "temple_def" 180 "temple_def" 180 }
+ 			expression_brow_wrinkles={ "brow_wrinkles_03" 88 "brow_wrinkles_03" 88 }
+ 			expression_eye_wrinkles={ "eye_wrinkles_01" 51 "eye_wrinkles_01" 51 }
+ 			expression_forehead_wrinkles={ "forehead_wrinkles_03" 255 "forehead_wrinkles_03" 255 }
+ 			expression_other={ "cheek_wrinkles_both_01" 0 "cheek_wrinkles_both_01" 0 }
+ 			complexion={ "complexion_5" 225 "complexion_5" 225 }
+ 			gene_height={ "normal_height" 134 "normal_height" 134 }
+ 			gene_bs_body_type={ "body_fat_head_fat_full" 105 "body_fat_head_fat_full" 105 }
+ 			gene_bs_body_shape={ "body_shape_average" 61 "body_shape_average" 61 }
+ 			gene_bs_bust={ "bust_clothes" 126 "bust_clothes" 126 }
+ 			gene_age={ "old_1" 103 "old_1" 103 }
+ 			gene_eyebrows_shape={ "far_spacing_avg_thickness" 136 "far_spacing_avg_thickness" 136 }
+ 			gene_eyebrows_fullness={ "layer_2_high_thickness" 199 "layer_2_high_thickness" 199 }
+ 			gene_body_hair={ "body_hair_avg" 233 "body_hair_avg" 233 }
+ 			gene_hair_type={ "hair_wavy" 161 "hair_wavy" 161 }
+ 			gene_baldness={ "male_pattern_baldness" 165 "male_pattern_baldness" 165 }
+ 			eye_accessory={ "normal_eyes" 28 "normal_eyes" 28 }
+ 			teeth_accessory={ "normal_teeth" 0 "normal_teeth" 0 }
+ 			eyelashes_accessory={ "normal_eyelashes" 173 "normal_eyelashes" 173 }
+ 			beards={ "western_beards_curly" 164 "western_beards_curly" 164 }
+ 			cloaks={ "no_cloak" 162 "no_cloak" 162 }
+ 			hairstyles={ "female_hair_steppe_02 164 "all_hairstyles" 0 }
+ 			legwear={ "western_common_legwear" 138 "western_common_legwear" 138 }
+ 			gene_shrink_body={ "shrink_all" 255 "" 0 }
+ 			gene_bs_additive_headgears={ "additive_headgears" 255 "" 0 }
+ 			gene_bs_cloak_offset={ "cloak_offset" 255 "" 0 }
+ 			gene_bs_long_beard={ "long_beard" 255 "" 0 }
+ 			clothes={ "fp4_western_era3_low_nobility_clothes" 224 "fp4_western_era3_low_nobility_clothes" 224 }
+ 			headgear={ "ep2_western_era3_nobility" 88 "ep2_western_era3_nobility" 88 }
+ 			gene_balding_hair_effect={ "no_baldness" 255 "no_baldness" 255 }
+			
+		}
+	}
+	
+	enabled = yes
+}`;
+// ==========================================
+// DATA: CULTURES (Extracted from script.js)
+// ==========================================
+const CULTURE_DB = {
+    'Norse': {
+        code: 'norse', religion: 'asatru',
+        male: ['Bjorn', 'Ivar', 'Ragnar', 'Harald', 'Erik', 'Leif', 'Olaf', 'Sigurdr', 'Hasteinn', 'Knut', 'Halfdan', 'Ubba', 'Sigurd', 'Gorm', 'Sweyn', 'Magnus', 'Hakon', 'Sverre', 'Inge', 'Eystein'],
+        female: ['Lagertha', 'Aslaug', 'Sigrid', 'Gunnhild', 'Thyra', 'Astrid', 'Freydis', 'Ragnheidr', 'Yrsa', 'Aud', 'Gudrun', 'Helga', 'Ingrid', 'Ragnhild', 'Thora', 'Vigdis', 'Ellisif', 'Malmfried', 'Ingeborg', 'Kristin']
+    },
+    'Anglo-Saxon': {
+        code: 'anglo_saxon', religion: 'catholic',
+        male: ['Alfred', 'Aethelred', 'Edgar', 'Godwin', 'Leofric', 'Oswald', 'Eadweard', 'Aethelstan', 'Eadred', 'Edmund', 'Eadwig', 'Cnut', 'Harold', 'Tostig', 'Gyrth', 'Leofwine', 'Wulfnoth', 'Siward', 'Morcar', 'Edwin'],
+        female: ['Eadgifu', 'Aethelflaed', 'Hilda', 'Godiva', 'Wynflaed', 'Aelfgifu', 'Eadburh', 'Ealdgyth', 'Eadgyth', 'Aethelthryth', 'Mildrith', 'Sexburh', 'Werburh', 'Wihtburh', 'Seaxburh', 'Eormenhild', 'Eorcengota', 'Domne', 'Eafe', 'Aebbe']
+    },
+    'Greek': {
+        code: 'greek', religion: 'orthodox',
+        male: ['Basileios', 'Konstantinos', 'Leo', 'Alexios', 'Ioannes', 'Nikephoros', 'Michael', 'Romanos', 'Theophilos', 'Andronikos', 'Manuel', 'Isaakios', 'Theodoros', 'Georgios', 'Demetrios', 'Christophoros', 'Stephanos', 'Niketas', 'Eustathios', 'Gregorios'],
+        female: ['Anna', 'Zoe', 'Theodora', 'Eirene', 'Maria', 'Eudokia', 'Helena', 'Sophia', 'Euphrosyne', 'Theophano', 'Ariadne', 'Pulcheria', 'Kassia', 'Xenia', 'Eulalia', 'Aikaterine', 'Despoina', 'Theoktiste', 'Martha', 'Simonida']
+    },
+    'French': {
+        code: 'french', religion: 'catholic',
+        male: ['Louis', 'Charles', 'Philippe', 'Henri', 'Robert', 'Hugues', 'Guillaume', 'Jean', 'Pierre', 'Jacques', 'Raoul', 'Gaston', 'Baldwin', 'Fulk', 'Geoffroy', 'Thibaut', 'Raymond', 'Bertrand', 'Amaury', 'Guy'],
+        female: ['Eleanor', 'Alienor', 'Marie', 'Isabelle', 'Blanche', 'Adela', 'Matilda', 'Constance', 'Jeanne', 'Marguerite', 'Agnes', 'Beatrice', 'Cecile', 'Emma', 'Gisela', 'Adelaide', 'Berthe', 'Clementia', 'Hedwig', 'Judith']
+    }
+};
+
+// ==========================================
+// DATA: TRAITS (Parsed from provided CSVs)
+// ==========================================
+// Helper to clean IDs from file paths in the CSV data
+function extractIdFromUrl(url) {
+    const filename = url.substring(url.lastIndexOf('/') + 1);
+    let id = filename.replace('.png', '').replace('60px-', '').replace('24px-', '');
+    if (id.startsWith('Trait_')) id = id.substring(6);
+    return id.toLowerCase();
+}
+
+const TRAIT_DB = {
+    education: [
+        {n: "Naive Appeaser", img: "https://ck3.paradoxwikis.com/images/thumb/7/7d/Trait_education_diplomacy_1.png/24px-Trait_education_diplomacy_1.png"},
+        {n: "Adequate Bargainer", img: "https://ck3.paradoxwikis.com/images/thumb/b/ba/Trait_education_diplomacy_2.png/24px-Trait_education_diplomacy_2.png"},
+        {n: "Charismatic Negotiator", img: "https://ck3.paradoxwikis.com/images/thumb/a/a3/Trait_education_diplomacy_3.png/24px-Trait_education_diplomacy_3.png"},
+        {n: "Grey Eminence", img: "https://ck3.paradoxwikis.com/images/thumb/1/19/Trait_education_diplomacy_4.png/24px-Trait_education_diplomacy_4.png"},
+        {n: "Misguided Warrior", img: "https://ck3.paradoxwikis.com/images/thumb/8/8a/Trait_education_martial_1.png/24px-Trait_education_martial_1.png"},
+        {n: "Tough Soldier", img: "https://ck3.paradoxwikis.com/images/thumb/2/25/Trait_education_martial_2.png/24px-Trait_education_martial_2.png"},
+        {n: "Skilled Tactician", img: "https://ck3.paradoxwikis.com/images/thumb/0/03/Trait_education_martial_3.png/24px-Trait_education_martial_3.png"},
+        {n: "Brilliant Strategist", img: "https://ck3.paradoxwikis.com/images/thumb/6/6c/Trait_education_martial_4.png/24px-Trait_education_martial_4.png"},
+        {n: "Indulgent Wastrel", img: "https://ck3.paradoxwikis.com/images/thumb/f/f6/Trait_education_stewardship_1.png/24px-Trait_education_stewardship_1.png"},
+        {n: "Thrifty Clerk", img: "https://ck3.paradoxwikis.com/images/thumb/2/2a/Trait_education_stewardship_2.png/24px-Trait_education_stewardship_2.png"},
+        {n: "Fortune Builder", img: "https://ck3.paradoxwikis.com/images/thumb/9/91/Trait_education_stewardship_3.png/24px-Trait_education_stewardship_3.png"},
+        {n: "Midas Touched", img: "https://ck3.paradoxwikis.com/images/thumb/8/8f/Trait_education_stewardship_4.png/24px-Trait_education_stewardship_4.png"},
+        {n: "Amateurish Plotter", img: "https://ck3.paradoxwikis.com/images/thumb/b/ba/Trait_education_intrigue_1.png/24px-Trait_education_intrigue_1.png"},
+        {n: "Flamboyant Trickster", img: "https://ck3.paradoxwikis.com/images/thumb/e/e8/Trait_education_intrigue_2.png/24px-Trait_education_intrigue_2.png"},
+        {n: "Intricate Webweaver", img: "https://ck3.paradoxwikis.com/images/thumb/a/ad/Trait_education_intrigue_3.png/24px-Trait_education_intrigue_3.png"},
+        {n: "Elusive Shadow", img: "https://ck3.paradoxwikis.com/images/thumb/1/17/Trait_education_intrigue_4.png/24px-Trait_education_intrigue_4.png"},
+        {n: "Conscientious Scribe", img: "https://ck3.paradoxwikis.com/images/thumb/b/b0/Trait_education_learning_1.png/24px-Trait_education_learning_1.png"},
+        {n: "Insightful Thinker", img: "https://ck3.paradoxwikis.com/images/thumb/5/5d/Trait_education_learning_2.png/24px-Trait_education_learning_2.png"},
+        {n: "Astute Intellectual", img: "https://ck3.paradoxwikis.com/images/thumb/e/e1/Trait_education_learning_3.png/24px-Trait_education_learning_3.png"},
+        {n: "Mastermind Philosopher", img: "https://ck3.paradoxwikis.com/images/thumb/a/a0/Trait_education_learning_4.png/24px-Trait_education_learning_4.png"}
+    ],
+    personality: [
+        {n: "Ambitious", img: "https://ck3.paradoxwikis.com/images/d/df/Trait_ambitious.png"},
+        {n: "Arbitrary", img: "https://ck3.paradoxwikis.com/images/6/67/Trait_arbitrary.png"},
+        {n: "Arrogant", img: "https://ck3.paradoxwikis.com/images/c/c0/Trait_arrogant.png"},
+        {n: "Brave", img: "https://ck3.paradoxwikis.com/images/c/c8/Trait_brave.png"},
+        {n: "Callous", img: "https://ck3.paradoxwikis.com/images/d/d1/Trait_callous.png"},
+        {n: "Calm", img: "https://ck3.paradoxwikis.com/images/6/69/Trait_calm.png"},
+        {n: "Chaste", img: "https://ck3.paradoxwikis.com/images/2/26/Trait_chaste.png"},
+        {n: "Compassionate", img: "https://ck3.paradoxwikis.com/images/5/5c/Trait_compassionate.png"},
+        {n: "Content", img: "https://ck3.paradoxwikis.com/images/2/28/Trait_content.png"},
+        {n: "Craven", img: "https://ck3.paradoxwikis.com/images/0/04/Trait_craven.png"},
+        {n: "Cynical", img: "https://ck3.paradoxwikis.com/images/c/c8/Trait_cynical.png"},
+        {n: "Deceitful", img: "https://ck3.paradoxwikis.com/images/4/47/Trait_deceitful.png"},
+        {n: "Diligent", img: "https://ck3.paradoxwikis.com/images/2/22/Trait_diligent.png"},
+        {n: "Forgiving", img: "https://ck3.paradoxwikis.com/images/2/2a/Trait_forgiving.png"},
+        {n: "Generous", img: "https://ck3.paradoxwikis.com/images/9/9f/Trait_generous.png"},
+        {n: "Gluttonous", img: "https://ck3.paradoxwikis.com/images/b/b7/Trait_gluttonous.png"},
+        {n: "Greedy", img: "https://ck3.paradoxwikis.com/images/1/19/Trait_greedy.png"},
+        {n: "Gregarious", img: "https://ck3.paradoxwikis.com/images/3/31/Trait_gregarious.png"},
+        {n: "Honest", img: "https://ck3.paradoxwikis.com/images/c/cf/Trait_honest.png"},
+        {n: "Humble", img: "https://ck3.paradoxwikis.com/images/3/37/Trait_humble.png"},
+        {n: "Impatient", img: "https://ck3.paradoxwikis.com/images/4/42/Trait_impatient.png"},
+        {n: "Just", img: "https://ck3.paradoxwikis.com/images/b/b4/Trait_just.png"},
+        {n: "Lazy", img: "https://ck3.paradoxwikis.com/images/a/a7/Trait_lazy.png"},
+        {n: "Lustful", img: "https://ck3.paradoxwikis.com/images/e/ed/Trait_lustful.png"},
+        {n: "Paranoid", img: "https://ck3.paradoxwikis.com/images/5/52/Trait_paranoid.png"},
+        {n: "Patient", img: "https://ck3.paradoxwikis.com/images/a/af/Trait_patient.png"},
+        {n: "Sadistic", img: "https://ck3.paradoxwikis.com/images/d/dd/Trait_sadistic.png"},
+        {n: "Shy", img: "https://ck3.paradoxwikis.com/images/f/f0/Trait_shy.png"},
+        {n: "Stubborn", img: "https://ck3.paradoxwikis.com/images/a/a2/Trait_stubborn.png"},
+        {n: "Temperate", img: "https://ck3.paradoxwikis.com/images/9/92/Trait_temperate.png"},
+        {n: "Trusting", img: "https://ck3.paradoxwikis.com/images/0/00/Trait_trusting.png"},
+        {n: "Vengeful", img: "https://ck3.paradoxwikis.com/images/f/f5/Trait_vengeful.png"},
+        {n: "Wrathful", img: "https://ck3.paradoxwikis.com/images/5/5d/Trait_wrathful.png"},
+        {n: "Zealous", img: "https://ck3.paradoxwikis.com/images/2/23/Trait_zealous.png"}
+    ],
+    congenital: [
+        {n: "Albino", img: "https://ck3.paradoxwikis.com/images/thumb/b/bb/Trait_albino.png/60px-Trait_albino.png"},
+        {n: "Bleeder", img: "https://ck3.paradoxwikis.com/images/thumb/3/36/Trait_bleeder.png/60px-Trait_bleeder.png"},
+        {n: "Club-footed", img: "https://ck3.paradoxwikis.com/images/thumb/4/4f/Trait_clubfooted.png/60px-Trait_clubfooted.png"},
+        {n: "Dwarf", img: "https://ck3.paradoxwikis.com/images/thumb/c/cc/Trait_dwarf.png/60px-Trait_dwarf.png"},
+        {n: "Fecund", img: "https://ck3.paradoxwikis.com/images/thumb/7/72/Trait_fecund.png/60px-Trait_fecund.png"},
+        {n: "Giant", img: "https://ck3.paradoxwikis.com/images/thumb/9/99/Trait_giant.png/60px-Trait_giant.png"},
+        {n: "Hunchbacked", img: "https://ck3.paradoxwikis.com/images/thumb/d/df/Trait_hunchbacked.png/60px-Trait_hunchbacked.png"},
+        {n: "Lisping", img: "https://ck3.paradoxwikis.com/images/thumb/b/b3/Trait_lisping.png/60px-Trait_lisping.png"},
+        {n: "Genius", img: "https://ck3.paradoxwikis.com/images/thumb/6/63/Trait_intellect_good_3.png/60px-Trait_intellect_good_3.png"},
+        {n: "Intelligent", img: "https://ck3.paradoxwikis.com/images/thumb/e/e5/Trait_intellect_good_2.png/60px-Trait_intellect_good_2.png"},
+        {n: "Quick", img: "https://ck3.paradoxwikis.com/images/thumb/2/27/Trait_intellect_good_1.png/60px-Trait_intellect_good_1.png"},
+        {n: "Imbecile", img: "https://ck3.paradoxwikis.com/images/thumb/0/09/Trait_intellect_bad_3.png/60px-Trait_intellect_bad_3.png"},
+        {n: "Stupid", img: "https://ck3.paradoxwikis.com/images/thumb/e/e3/Trait_intellect_bad_2.png/60px-Trait_intellect_bad_2.png"},
+        {n: "Slow", img: "https://ck3.paradoxwikis.com/images/thumb/d/d6/Trait_intellect_bad_1.png/60px-Trait_intellect_bad_1.png"},
+        {n: "Beautiful", img: "https://ck3.paradoxwikis.com/images/thumb/c/cb/Trait_beauty_good_3.png/60px-Trait_beauty_good_3.png"},
+        {n: "Handsome", img: "https://ck3.paradoxwikis.com/images/thumb/3/36/Trait_beauty_good_2.png/60px-Trait_beauty_good_2.png"},
+        {n: "Comely", img: "https://ck3.paradoxwikis.com/images/thumb/9/90/Trait_beauty_good_1.png/60px-Trait_beauty_good_1.png"},
+        {n: "Herculean", img: "https://ck3.paradoxwikis.com/images/thumb/7/76/Trait_physique_good_3.png/60px-Trait_physique_good_3.png"},
+        {n: "Robust", img: "https://ck3.paradoxwikis.com/images/thumb/1/1a/Trait_physique_good_2.png/60px-Trait_physique_good_2.png"},
+        {n: "Hale", img: "https://ck3.paradoxwikis.com/images/thumb/9/9b/Trait_physique_good_1.png/60px-Trait_physique_good_1.png"}
+    ]
+};
+
+// Data structure for Barbara's fixed dates and dynasty
+const BARBARA_PRESETS = {
+    '7860867': { startYear: '867', birth: '847.1.1', death: '922.1.1', dynasty: 'random' }, // Based on source 1, 2, 3
+    '7861066': { startYear: '1066', birth: '1046.1.1', death: '1121.1.1', dynasty: 'random' }, // Based on source 4, 5
+    '7861178': { startYear: '1178', birth: '1157.1.1', death: '1277.1.1', dynasty: '8661' }  // Based on source 6, 7
+};
+
+// Pre-calculate IDs for the database
+Object.keys(TRAIT_DB).forEach(cat => {
+    TRAIT_DB[cat].forEach(trait => {
+        trait.id = extractIdFromUrl(trait.img);
+    });
+});
+
+// New data structure for Easter Egg DNA (copied from original file)
+const EASTER_EGG_DNA_DB = {}; 
+
+const EASTER_EGG_RAW_DATA = `
+# FOLKS OF OLD
+easteregg_johan_andersson = {
+	name = "Johan"
+	# ...
+}
+
+easteregg_thomas_johansson = {
+	name = "Thomas"
+	# ...
+}
+
+easteregg_martin_anward = {
+	name = "Martin"
+	dynasty = vanity_anward
+	dna = easteregg_martin_anward
+	# ...
+}
+
+##################################################
+# FOLKS OF NEW
+
+# Game Director
+easteregg_henrik_fahraeus = {
+	name = "Henrik"
+	dna = easteregg_henrik_fahraeus
+	# ...
+}
+
+# Tech lead
+easteregg_olof_bjork = {
+	name = "Olof"
+	dna = easteregg_olof_bjork
+	# ...
+}
+
+# Content Designer
+easteregg_tobias_bodlund = {
+	name = "Tobias"
+	# ...
+}
+
+# Game Designer, QA
+easteregg_emil_tisander = {
+	name = "Emil"
+	dna = easteregg_emil_tisander
+	# ...
+}
+
+# Game Director, Game Designer
+easteregg_alexander_oltner = {
+	name = "Alexander"
+	dna = easteregg_alexander_oltner
+	# ...
+}
+
+# Senior Producer
+easteregg_linda_tiger = {
+	name = "Linda"
+	dna = easteregg_linda_tiger
+	female = yes
+	# ...
+}
+
+# Producer
+easteregg_charna_frostwhisper = {
+	name = "Charna"
+	female = yes
+	# ...
+}
+
+# Tech Lead
+easteregg_lysann_schlegel = {
+	name = "Lysann"
+	dna = easteregg_lysann_schlegel
+	female = yes
+	# ...
+}
+
+# Localization manager
+easteregg_sara_wendel = {
+	name = "Sara"
+	female = yes
+	# ...
+}
+
+# Design manager
+easteregg_pernilla_sparrhult = {
+	name = "Pernilla"
+	female = yes
+	# ...
+}
+
+# Content Designer
+easteregg_mathilda_bjarnehed = {
+	name = Mathilda
+	dna = easteregg_mathilda_bjarnehed
+	female = yes
+	# ...
+}
+
+# QA
+easteregg_matthew_frary = {
+	name = "Matthew"
+	# ...
+}
+
+# Programmer
+easteregg_matthew_clohessy = {
+	name = "Matthew"
+	dna = easteregg_matthew_clohessy
+	# ...
+}
+
+# Content Designer
+easteregg_linnea_thimren = {
+	name = Linne_a
+	dna = easteregg_linnea_thimren
+	female = yes
+	# ...
+}
+
+# Content Designer (Freelance)
+easteregg_flavio_verna = {
+	name = "Flavio"
+	# ...
+}
+
+# Content Designer
+easteregg_sean_hughes = {
+	name = Sean
+	dna = easteregg_sean_hughes
+	# ...
+}
+
+# Content Designer
+easteregg_petter_vilberg = {
+	name = Petter
+	dna = easteregg_petter_vilberg
+	# ...
+}
+
+# Content Design Lead
+easteregg_maximilian_olbers = {
+	name = Maximilian
+	dna = easteregg_maximilian_olbers
+	# ...
+}
+
+# Content Designer
+easteregg_milla_lankinen = {
+	name = Milla
+	dna = easteregg_milla_lankinen
+	female = yes
+	# ...
+}
+
+# QA Lead, QA
+easteregg_jakub_potapczyk = {
+	name = "Jakub"
+	dna = easteregg_jakub_potapczyk
+	# ...
+}
+
+# QA Project Coordinator, QA, Content Designer
+easteregg_ewan_cowhig_croft = {
+	name = "Ewan"
+	# ...
+}
+
+# 3D Art Lead
+easteregg_joacim_carlberg = {
+	name = "Joacim"
+	dna = easteregg_joacim_carlberg
+	# ...
+}
+
+# Technical Artist
+easteregg_david_horler = {
+	name = "David"
+	# ...
+}
+
+# QA
+easteregg_paul_depre = {
+	name = "Paul"
+	dna = easteregg_paul_depre
+	# ...
+}
+
+# Customer Support Specialist
+easteregg_debbie_lane = {
+	name = "Debbie"
+	dna = easteregg_debbie_lane
+	female = yes
+	# ...
+}
+
+# 2D Art Lead, 2D Artist
+easteregg_petter_lundh = {
+	name = "Petter"
+	dna = easteregg_petter_lundh
+	# ...
+}
+
+# Game Designer, Content Designer, QA Manager, QA Lead, QA Project Coordinator, QA
+easteregg_nicholas_meredith = {
+	name = "Nicholas"
+	# ...
+}
+
+# QA
+easteregg_william_riggott = {
+	name = "William"
+	# ...
+}
+
+# QA Project Coordinator, QA
+easteregg_anna_johansson = {
+	name = "Anna"
+	female = yes
+	# ...
+}
+
+# QA
+easteregg_arkadiusz_majewski = {
+	name = "Arkadiusz"
+	# ...
+}
+
+# QA
+easteregg_artur_kacprzak = {
+	name = "Artur"
+	dna = easteregg_artur_kacprzak_dna
+	# ...
+}
+
+# 3D Environment Artist
+easteregg_anton_leirnes = {
+	name = "Anton"
+	dna = easteregg_anton_leirnes
+	# ...
+}
+
+# Programmer
+easteregg_anton_sorokin = {
+	name = "Anton"
+	# ...
+}
+
+# Tech Lead
+easteregg_joel_hansson = {
+	name = "Joel"
+	dna = easteregg_joel_hansson
+	# ...
+}
+
+easteregg_nikola_stokic = {
+	name = Nikola
+	dna = easteregg_nikola_stokic_dna
+	# ...
+}
+
+# Junior 2D Artist
+easteregg_malin_jonsson = {
+	name = "Malin"
+	dna = easteregg_malin_jonsson
+	female = yes
+	# ...
+}
+
+# Product Manager
+easteregg_max_weltz = {
+	name = "Marc"
+	dna = easteregg_max_weltz
+	# ...
+}
+
+# UX Designer
+easteregg_jonas_wickerstrom = {
+	name = "Jonas"
+	dna = easteregg_jonas_wickerstrom
+	# ...
+}
+
+# Map Design
+easteregg_arthur_bialecki = {
+	name = "Arthur"
+	# ...
+}
+
+# CoA designer
+easteregg_patrick_mauffrey = {
+	name = "Patrick"
+	# ...
+}
+
+# Commercial Manager
+easteregg_viktor_stadler = {
+	name = "Viktor"
+	# ...
+}
+
+# PR
+easteregg_jesse_henning = {
+	name = "Jesse"
+	# ...
+}
+
+# Community Developer
+easteregg_rodrigue_delrue = {
+	name = "Rodrigue"
+	# ...
+}
+
+# User Research
+easteregg_hanna_lohman = {
+	name = "Hanna"
+	dna = easteregg_hanna_lohman
+	female = yes
+	# ...
+}
+
+# Associate Producer
+easteregg_daniel_moore = {
+	name = "Daniel"
+	# ...
+}
+
+# QA
+easteregg_bartosz_byczynski = {
+	name = "Bartosz"
+	# ...
+}
+
+# QA
+easteregg_joseph_gardener = {
+	name = "Joseph"
+	# ...
+}
+
+# UX Designer
+easteregg_peter_johannesson = {
+	name = "Peter"
+	dna = easteregg_peter_johannesson
+	# ...
+}
+
+# PR
+easteregg_troy_goodfellow = {
+	name = "Troy"
+	# ...
+}
+
+# QA/Data Scientist
+easteregg_katya_boestad = {
+	name = "Katya"
+	dna = easteregg_katya_boestad
+	female = yes
+	# ...
+}
+
+# Content designer
+easteregg_bianca_savazzi = {
+	name = "Bianca"
+	dna = easteregg_bianca_savazzi
+	female = yes
+	# ...
+}
+
+# Data Scientist
+easteregg_steacy_mcilwham = {
+	name = Steacy
+	dna = easteregg_steacy_mcilwham
+	female = yes
+	# ...
+}
+
+# Character Artist
+easteregg_nils_wadensten = {
+	name = "Nils"
+	dna = easteregg_nils_wadensten
+	# ...
+}
+
+# QA Project Coordinator
+easteregg_andreas_olsson = {
+	name = "Andreas"
+	# ...
+}
+
+# Design Lead, Map Design
+easteregg_henrik_lohmander = {
+	name = "Henrik"
+	dna = easteregg_henrik_lohmander
+	# ...
+}
+
+# Programmer
+easteregg_ismael_serrano = {
+	name = "Ismael"
+	dna = easteregg_ismael_serrano
+	# ...
+}
+
+# Community Ambassador
+easteregg_fawn_rowe = {
+	name = "Fawn"
+	female = yes
+	# ...
+}
+
+# Community Ambassador
+easteregg_lenaic_riedinger = {
+	name = "Le_nai_c"
+	# ...
+}
+
+# QA
+easteregg_niall_bird = {
+	name = "Niall"
+	# ...
+}
+
+# PMM
+easteregg_christian_daflos = {
+	name = "Christian"
+	dna = easteregg_christian_daflos
+	# ...
+}
+
+# Marketing Creative Producer
+easteregg_max_collin = {
+	name = "Max"
+	dna = easteregg_max_collin
+	# ...
+}
+
+# Junior Producer
+easteregg_tegan_harris = {
+	name = "Tegan"
+	dna = easteregg_tegan_harris
+	female = yes
+	# ...
+}
+
+# QA
+easteregg_wojciech_cywinski = {
+	name = "Wojciech"
+	# ...
+}
+
+# Character Artist
+easteregg_nikolaos_kaltsogiannis = {
+	name = "Nikolaos"
+	dna = easteregg_nikolaos_kaltsogiannis
+	# ...
+}
+
+# Art Director
+easteregg_pontus_olofsson = {
+	name = "Pontius"
+	dna = easteregg_pontus_olofsson
+	# ...
+}
+
+# QA
+easteregg_karl_cederslatt = {
+	name = "Karl"
+	# ...
+}
+
+# QA
+easteregg_sebastian_borg = {
+	name = "Sebastian"
+	# ...
+}
+
+
+# Programmer
+easteregg_elisabeth_gangenes = { #Programmer
+	name = "Elisabeth"
+	dna = easteregg_elisabeth_gangenes
+	female = yes
+	# ...
+}
+
+# Content Designer
+easteregg_isabella_welch = {
+	name = "Beau"
+	dna = easteregg_isabella_welch
+	# ...
+}
+
+# Programmer
+easteregg_zack_holmgren = {
+	name = "Zack"
+	dna = easteregg_zack_holmgren
+	# ...
+}
+
+# Content Designer
+easteregg_claudia_baldassi = {
+	name = "Claudia"
+	female = yes
+	# ...
+}
+
+#Community Manager
+easteregg_bjorn_blomberg = {
+	name = "BjO_rn"
+	# ...
+}
+
+# Content Designer
+easteregg_joe_parkin = {
+	name = "Joe"
+	dna = easteregg_joe_parkin
+	# ...
+}
+
+# QA
+easteregg_krzysztof_bochenek = {
+	name = "Krzysztof"
+	# ...
+}
+
+# QA
+easteregg_lukasz_opara = {
+	name = "L_ukasz"
+	dna = easteregg_lukasz_opara
+	# ...
+}
+
+# QA
+easteregg_mateusz_mierzwa = {
+	name = "Mateusz"
+	dna = easteregg_mateusz_mierzwa
+	# ...
+}
+
+# QA
+easteregg_natalia_lechnata = {
+	name = "Natalia"
+	dna = easteregg_natalia_lechnata
+	female = yes
+	# ...
+}
+
+# QA
+easteregg_natalia_poreba = {
+	name = "Natalia"
+	dna = easteregg_natalia_poreba
+	female = yes
+	# ...
+}
+
+# QA
+easteregg_alexander_windahl = {
+	name = "Alexander"
+	dna = easteregg_alexander_windahl
+	# ...
+}
+
+# QA
+easteregg_struan_mccallum = {
+	name = "Struan"
+	# ...
+}
+
+# QA
+easteregg_riad_deneche = {
+	name = "Riad"
+	dna = easteregg_riad_deneche
+	# ...
+}
+
+# QA
+easteregg_fenni_johansson = {
+	name = "Fenni"
+	female = yes
+	# ...
+}
+
+#Content Design
+easteregg_james_beaumont = {
+	name = "James"
+	dna = easteregg_james_beaumont_dna
+	# ...
+}
+
+# Programmer
+easteregg_bahar_shefket = {
+	name = "Bahar"
+	dna = easteregg_bahar_shefket
+	female = yes
+	# ...
+}
+
+
+easteregg_ola_jentzsch = { # Content Design
+	name = "Ola"
+	dna = easteregg_ola_jentzsch
+	# ...
+}
+
+
+easteregg_hugo_cortell = { # Game Designer, Paradox Thalassic
+	name = "Hugo"
+	dna = easteregg_hugo_cortell
+	# ...
+}
+
+# Content Design
+easteregg_alexander_newcombe = {
+	name = "Alexander"
+	# ...
+}
+
+# Character Artist
+easteregg_elena_zenko = {
+	name = "HelenE_"
+	dna = easteregg_elena_zenko
+	female = yes
+	# ...
+}
+
+# 3D Environment Artist
+easteregg_stina_arvidsson_radestig = {
+	name = "Stina"
+	dna = easteregg_stina_arvidsson_radestig
+	female = yes
+	# ...
+}
+
+easteregg_sandra_runge_moller = { #QA
+	name = "Sandra"
+	dna = easteregg_sandra_runge_moller
+	female = yes
+	# ...
+}
+
+easteregg_stella_carrick = {
+	name = "Stella"
+	dna = easteregg_stella_carrick_dna
+	female = yes
+	# ...
+}
+
+# Concept Artist
+easteregg_alessandro_bragalini = {
+	name = "Alessandro"
+	dna = easteregg_alessandro_bragalini
+	# ...
+}
+
+# User Researcher
+easteregg_jenny_wickman = {
+	name = "Jenny"
+	female = yes
+	# ...
+}
+
+# Research Coordinator
+easteregg_anna_strom = {
+	name = "Anna"
+	dna = easteregg_anna_strom
+	female = yes
+	# ...
+}
+
+# 2D UI Artist
+easteregg_jon_astrup_hallkvist = {
+	name = "Jon"
+	dna = easteregg_jon_astrup_hallkvist
+	# ...
+}
+
+easteregg_maxence_voleau = { # Game Director
+	name = "Maxentius"
+	dna = easteregg_maxence_voleau
+	# ...
+}
+
+easteregg_fei_berg_hulthen = { # Technical Animator
+	name = "Fei"
+	dna = easteregg_fei_berg_hulthen
+	# ...
+}
+
+# Game Design
+easteregg_chad_uhl = {
+	name = "Chad"
+	dna = easteregg_chad_uhl
+	# ...
+}
+
+# Game Designer
+easteregg_jason_cantalini = {
+	name = "Giasone"
+	dna = easteregg_jason_cantalini_dna
+	# ...
+}
+
+# QA
+easteregg_fabian_franzen = {
+	name = "Fabian"
+	dna = easteregg_fabian_franzen_dna
+	# ...
+}
+
+# Game Designer
+easteregg_veronica_pazos = {
+	name = "Veronica"
+	dna = easteregg_veronica_pazos_dna
+	female = yes
+	# ...
+}
+
+# 2D Artist
+easteregg_weronika_kowalczyk = {
+	name = "Weronika"
+	female = yes
+	# ...
+}
+
+# PMM
+easteregg_jakob_jorstedt = {
+	name = "Jakob"
+	dna = easteregg_jakob_jorstedt_dna
+	# ...
+}
+
+# Producer
+easteregg_tess_lindholm = {
+	name = "Tess"
+	dna = easteregg_tess_lindholm_dna
+	female = yes
+	# ...
+}
+
+# UX
+easteregg_johanna_hermansson = {
+	name = "Johanna"
+	female = yes
+	# ...
+}
+
+# Programmer
+easteregg_daan_broekhof = {
+	name = "Daan"
+	dna = easteregg_daan_broekhof_dna
+	# ...
+}
+
+# Programmer
+easteregg_oscar_andersson = {
+	name = "Oscar"
+	# ...
+}
+
+# Art Manager
+easteregg_berrak_oz = {
+	name = "Berrak"
+	dna = easteregg_berrak_oz
+	female = yes
+	# ...
+}
+
+# Producer
+easteregg_martin_tosta = {
+	name = "Martin"
+	# ...
+}
+
+# Programmer
+easteregg_jakob_eklund = {
+	name = "Jakob"
+	dna = easteregg_jakob_eklund_dna
+	# ...
+}
+
+# Game Design
+easteregg_luke_bean = {
+	name = "Lugh"
+	dna = easteregg_luke_bean_dna
+	# ...
+}
+
+# Design Manager
+easteregg_ida_hedberg = {
+	name = "Ida"
+	dna = easteregg_ida_hedberg_dna
+	female = yes
+	# ...
+}
+
+# Artist
+easteregg_lucas_ribeiro = {
+	name = "Lucas"
+	dna = easteregg_lucas_ribeiro_dna
+	# ...
+}
+
+# Programmer manager
+easteregg_tomas_versekys = {
+	name = "Tomas"
+	# ...
+}
+
+# Release Engineer
+easteregg_david_drake = { 
+	name = "David"
+	dna = easteregg_david_drake
+	# ...
+}
+
+# Design Manager
+easteregg_johan_husen = {
+	name = "Johan"
+	dna = easteregg_johan_husen_dna
+	# ...
+}
+
+# Artist
+easteregg_alva_granholm = {
+	name = "Alva"
+	dna = easteregg_alva_granholm_dna
+	female = yes
+	# ...
+}
+
+# Producer
+easteregg_lucia_dzediti = {
+	name = "Lucia"
+	dna = easteregg_lucia_dzediti
+	female = yes
+	# ...
+}
+
+# Audio Director
+easteregg_ernesto_lopez = {
+	name = "Ernesto"
+	dna = easteregg_ernesto_lopez_dna
+	# ...
+}
+
+# UX Designer
+easteregg_daniel_velasquez = {
+	name = "Daniel"
+	dna = easteregg_daniel_velasquez_dna
+	# ...
+}
+
+# PMM
+easteregg_francesca_passoni = {
+	name = "Francesca"
+	female = yes
+	# ...
+}
+
+# Technical Animator
+easteregg_emelie_verdugo = {
+	name = "Emelie"
+	dna = easteregg_emelie_verdugo_dna
+	female = "yes"
+	# ...
+}
+
+# QA
+easteregg_carsten_mannetje = {
+	name = "Carsten"
+	# ...
+}
+
+# 2D Artist
+easteregg_celine_jensen = {
+	name = "CE_line"
+	dna = easteregg_celine_jensen_dna
+	female = "yes"
+	# ...
+}
+
+# Studio Manager
+easteregg_johanna_uddstahl = {
+	name = "Johanna"
+	dna = easteregg_johanna_uddstahl_dna
+	female = "yes"
+	# ...
+}
+
+# 2D Artist
+easteregg_anton_holmqvist = {
+	name = "Anton"
+	dna = easteregg_anton_holmqvist_dna
+	# ...
+}
+
+# Audio Producer
+easteregg_samet_atasoy = {
+	name = "Samet"
+	dna = easteregg_samet_atasoy_dna
+	# ...
+}
+
+# Game Design
+easteregg_daniel_tolman = {
+	name = "Daniel"
+	dna = easteregg_daniel_tolman_dna
+	# ...
+}
+
+# Office
+easteregg_rebecca_gottfredsson = {
+	name = "Rebecka"
+	dna = easteregg_rebecca_gottfredsson_dna
+	female = yes
+	# ...
+}
+
+# Front Desk
+easteregg_melanie_albarn = {
+	name = "Melanie"
+	dna = easteregg_melanie_albarn_dna
+	female = yes
+	# ...
+}
+
+# IT
+easteregg_sarah_lager = {
+	name = "Sarah"
+	# ...
+}
+
+# IT
+easteregg_david_ostlund = {
+	name = "David"
+	dna = easteregg_david_ostlund_dna
+	# ...
+}
+
+# IT
+easteregg_mathias_frostewarn = {
+	name = "Mathias"
+	dna = easteregg_mathias_frostewarn_dna
+	# ...
+}
+
+# IT
+easteregg_richard_lindkvist = {
+	name = "Richard"
+	# ...
+}
+
+# IT
+easteregg_tomasz_ender = {
+	name = "Tomasz"
+	dna = easteregg_tomasz_ender_dna
+	# ...
+}
+
+# IT
+easteregg_marcus_bose = {
+	name = "Marcus"
+	# ...
+}
+
+# IT
+easteregg_philip_wessman = {
+	name = "Philip"
+	# ...
+}
+
+# IT
+easteregg_neyla_garcia = {
+	name = "Neyla"
+	female = yes
+	# ...
+}
+
+# Programmer
+easteregg_jacopo_freddi = {
+	name = "Jacopo"
+	dna = easteregg_jacopo_freddi_dna
+	# ...
+}
+
+# IT
+easteregg_jesse_kopparvall = {
+	name = "Jesse"
+	# ...
+}
+
+# Release Manager
+easteregg_louise_mutel = {
+	name = "Louise"
+	female = yes
+	# ...
+}
+
+# Programmer
+easteregg_jonathan_collinder = {
+	name = "Jonathan"
+	dna = easteregg_jonathan_collinder_dna
+	# ...
+}
+`;
+
+
+/**
+ * Parses the raw Easter Egg data to extract ID, name, and DNA string.
+ * This is a highly specialized parser for the provided format.
+ */
+function parseEasterEggData(rawData) {
+    const db = {};
+    const blocks = rawData.split(/easteregg_[a-z_]+ = \{/g).slice(1); // Split by character block start
+
+    for (let i = 0; i < blocks.length; i++) {
+        const block = blocks[i];
+        // The ID is whatever is right before the block split, captured from the original string.
+        // Re-locate the ID:
+        const idRegex = /easteregg_[a-z_]+/g;
+        // Search back in the original string up to the start of this block.
+        // This is fragile, so we rely on the ID being present on the first line of the block if it exists.
+        const charIDMatch = block.match(/^\s*name = "*(.+?)"*\s*\n/i);
+        if (!charIDMatch) continue; // Skip if no name found.
+
+        const charIDLine = rawData.substring(0, rawData.indexOf(block)).match(/easteregg_[a-z_]+(?=\s*=\s*{)/g);
+        const charID = charIDLine ? charIDLine.pop() : null;
+        if (!charID) continue;
+
+
+        const nameMatch = block.match(/name = "*(.+?)"*\s*\n/i);
+        const dnaMatch = block.match(/dna = (easteregg_.+?)\s*\n/i);
+        const femaleMatch = block.match(/female = (yes|"yes"|no|"no")/i);
+
+        const name = nameMatch ? nameMatch[1].replace(/_/g, ' ') : charID.replace('easteregg_', '').replace(/_/g, ' ');
+        const dna = dnaMatch ? dnaMatch[1] : null;
+        const isFemale = (femaleMatch && femaleMatch[1].toLowerCase().includes('yes'));
+        
+        // A character has DNA if:
+        // 1. A specific 'dna = ...' line exists OR
+        // 2. The ID itself contains a scripted DNA name (e.g. easteregg_martin_anward for dna = easteregg_martin_anward)
+        const finalDna = dna || charID;
+
+        db[charID] = {
+            id: charID,
+            name: name,
+            dna: finalDna,
+            isFemale: isFemale
+        };
+    }
+    return db;
+}
+
+
+// Original user default data for fallback
+const DEFAULT_NAMES = `male:{
+    Aemilian Aemilius Aetius Albinus Alexander
+}
+female:{
+    Aelia Agrippina Antonia Antonina Aquilia
+}`;
+
+// ==========================================
+// CLASS LOGIC
+// ==========================================
+
+class Character {
+    constructor(id, config, nameLists, traitList) {
+        this.id = id;
+        this.config = config;
+        this.name = "";
+        this.age = 0;
+        this.isfemale = false;
+        this.traits = [];
+        this.dnaOverride = config.dnaOverride; // New: DNA override ID
+        
+        this.birth = { year: 0, month: 0, day: 0 };
+        this.death = { year: 0, month: 0, day: 0, dead: false };
+
+        this.init(nameLists, traitList);
+    }
+
+    init(nameLists, traitList) {
+        this.determineBirthDeath();
+        this.determineGender();
+        this.determineName(nameLists);
+        this.determineTraits(traitList);
+        
+        // If DNA override is selected, use the name and gender from the override if available
+        if (this.dnaOverride) {
+            const dnaChar = EASTER_EGG_DNA_DB[this.dnaOverride];
+            if (dnaChar) {
+                // Remove underscores from the name and capitalize words
+                this.name = dnaChar.name.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ').trim();
+                this.isfemale = dnaChar.isFemale;
+            }
+        }
+    }
+
+    getRandomInt(min, max) {
+        min = Math.ceil(min);
+        max = Math.floor(max);
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    determineGender() {
+        if (this.dnaOverride && EASTER_EGG_DNA_DB[this.dnaOverride]) {
+            this.isfemale = EASTER_EGG_DNA_DB[this.dnaOverride].isFemale;
+            return;
+        }
+        const roll = Math.random() * 100;
+        this.isfemale = (roll < this.config.femalePercent);
+    }
+
+    determineBirthDeath() {
+        let setAge = this.getRandomInt(this.config.minAge, this.config.maxAge);
+        let mortalityChance = Math.random() * 100;
+        let ageMod = setAge;
+        let baseDeathChance = mortalityChance + ageMod;
+        let maxDeathChance = 100 + this.config.maxAge;
+
+        if (baseDeathChance > 100 + this.config.maxAge) {
+            baseDeathChance = maxDeathChance;
+        }
+
+        this.age = setAge;
+        if (this.age >= this.config.maxAge) this.age = this.config.maxAge;
+        if (this.age <= this.config.minAge) this.age = this.config.minAge;
+
+        const rangeStart = -Math.abs(this.config.minDateRange);
+        const rangeEnd = this.config.maxDateRange; 
+        const randomOffset = this.getRandomInt(rangeStart, rangeEnd - 1);
+        
+        this.birth.year = this.config.startYear + randomOffset;
+
+        if (this.age >= this.config.maxAge) this.death.dead = true;
+        if (baseDeathChance >= maxDeathChance) this.death.dead = true;
+        if (baseDeathChance > 50 && mortalityChance > 80) this.death.dead = true;
+
+        if (this.death.dead) {
+            this.death.year = this.birth.year + this.age;
+        } else {
+            const futureYears = this.getRandomInt(25, 45);
+            if (this.age <= this.config.maxAge + futureYears) {
+                this.death.year = this.birth.year + this.age + futureYears;
+            } else {
+                this.death.year = this.birth.year + this.age;
+            }
+        }
+
+        this.birth.month = this.getRandomInt(1, 12);
+        this.birth.day = this.getDaysInMonth(this.birth.month);
+        this.death.month = this.getRandomInt(1, 12);
+        this.death.day = this.getDaysInMonth(this.death.month);
+    }
+
+    getDaysInMonth(month) {
+        if (month === 2) return this.getRandomInt(1, 28);
+        if ([4, 6, 9, 11].includes(month)) return this.getRandomInt(1, 30);
+        return this.getRandomInt(1, 31);
+    }
+
+    determineName(nameLists) {
+        if (this.dnaOverride && EASTER_EGG_DNA_DB[this.dnaOverride]) {
+            // Name is already set in init if DNA override is used
+            return;
+        }
+        
+        const list = this.isfemale ? nameLists.female : nameLists.male;
+        if (list && list.length > 0) {
+            this.name = list[Math.floor(Math.random() * list.length)];
+        } else {
+            this.name = "Unnamed";
+        }
+    }
+
+    determineTraits(traitList) {
+        if (!traitList || traitList.length === 0) return;
+        
+        const count = this.getRandomInt(0, this.config.maxTraits);
+        let available = [...traitList];
+        
+        for (let i = 0; i < count; i++) {
+            if (available.length === 0) break;
+            const idx = Math.floor(Math.random() * available.length);
+            this.traits.push(available[idx]);
+            available.splice(idx, 1);
+        }
+    }
+
+    generateString() {
+        let str = `\t${this.config.culture}_${this.id} = {\n`;
+        str += `\t\tname = "${this.name}"\n`;
+        
+        if (this.dnaOverride) {
+            str += `\t\tdna = ${EASTER_EGG_DNA_DB[this.dnaOverride].dna}\n`;
+        }
+        str += `\n`;
+        str += `\t\treligion = ${this.config.religion}\n`;
+        str += `\t\tculture = ${this.config.culture}\n`;
+        
+        if (this.isfemale) {
+            str += `\t\tfemale = yes\n`;
+        }
+
+        this.traits.forEach(t => {
+            str += `\t\ttrait = ${t}\n`;
+        });
+        
+        // Add disallow_random_traits if a specific DNA is used (common practice for scripted characters)
+        if (this.dnaOverride) {
+            str += `\t\tdisallow_random_traits = yes\n`;
+        }
+
+        str += `\n\t\t${this.birth.year}.${this.birth.month}.${this.birth.day} = {\n`;
+        str += `\t\t\tbirth = yes\n`;
+        str += `\t\t}\n`;
+
+        str += `\t\t${this.death.year}.${this.death.month}.${this.death.day} = {\n`;
+        str += `\t\t\tdeath = yes\n`;
+        str += `\t\t}\n`;
+
+        str += `\t}\n\n`;
+        return str;
+    }
+}
+
+// ==========================================
+// UI LOGIC
+// ==========================================
+
+let selectedTraits = new Set();
+let currentTab = 'random';
+let currentSubTab = 'education';
+
+// Populate the new DNA DB on load
+Object.assign(EASTER_EGG_DNA_DB, parseEasterEggData(EASTER_EGG_RAW_DATA));
+
+function getElementVal(id) {
+    return document.getElementById(id).value;
+}
+
+function parseNames(rawText) {
+    const extract = (key) => {
+        const regex = new RegExp(`${key}:\\s*\\{([\\s\\S]*?)\\}`, 'i');
+        const match = rawText.match(regex);
+        if (match && match[1]) {
+            // Match specific "A-Z" names to handle messy input better
+            return match[1].match(/[a-zA-Z\u00C0-\u00FF]+/g) || [];
+        }
+        return [];
+    };
+    return { male: extract('male'), female: extract('female') };
+}
+
+function getManualTraits() {
+    const raw = document.getElementById('traitsInput').value;
+    return raw.split('\n').map(t => t.trim()).filter(t => t.length > 0);
+}
+
+// Function to update fields based on selected ID/Date Preset
+function updateBarbaraDatesAndDynasty() {
+    const charID = document.getElementById('barbaraIDSelect').value;
+    const preset = BARBARA_PRESETS[charID];
+    if (preset) {
+        document.getElementById('barbaraBirth').value = preset.birth;
+        document.getElementById('barbaraDeath').value = preset.death;
+        document.getElementById('barbaraDynasty').value = preset.dynasty;
+    }
+}
+
+// Initialize UI with Data
+function initUI() {
+    // Set initial Barbara state
+    updateBarbaraDatesAndDynasty();
+
+    // Populate Culture Dropdown
+    const sel = document.getElementById('cultureSelect');
+    Object.keys(CULTURE_DB).forEach(key => {
+        const opt = document.createElement('option');
+        opt.value = key;
+        opt.innerText = key;
+        sel.appendChild(opt);
+    });
+    
+    // Populate DNA Dropdown
+    const dnaSel = document.getElementById('dnaSelect');
+    Object.values(EASTER_EGG_DNA_DB).filter(char => char.dna).sort((a, b) => a.name.localeCompare(b.name)).forEach(char => {
+        const opt = document.createElement('option');
+        opt.value = char.id;
+        let genderTag = char.isFemale ? ' (F)' : ' (M)';
+        opt.innerText = `${char.name}${genderTag} [${char.dna}]`;
+        dnaSel.appendChild(opt);
+    });
+    
+    // Render Traits
+    ['education', 'personality', 'congenital'].forEach(cat => {
+        const container = document.getElementById(`subtab-${cat}`);
+        TRAIT_DB[cat].forEach(trait => {
+            const el = document.createElement('div');
+            el.className = 'trait-item';
+            el.onclick = () => toggleTrait(el, trait.id);
+            el.innerHTML = `
+                <img src="${trait.img}" class="trait-icon">
+                <div class="trait-tooltip">${trait.n}</div>
+            `;
+            container.appendChild(el);
+        });
+    });
+    
+    // Select first culture by default
+    sel.value = 'Norse';
+    applyCulturePreset();
+    
+    // Initialize the main tabs
+    switchTab(document.querySelector('.tabs.is-toggle > ul > li:first-child'), 'random');
+    switchSubTab(document.querySelector('#tab-random .tabs.is-toggle > ul > li:first-child'), 'education');
+}
+
+function applyCulturePreset() {
+    const key = document.getElementById('cultureSelect').value;
+    if (key === 'manual') return;
+
+    const data = CULTURE_DB[key];
+    if (data) {
+        document.getElementById('culture').value = data.code;
+        document.getElementById('religion').value = data.religion;
+        
+        // Format names into the text box
+        const txt = `male:{\n    ${data.male.join(' ')}\n}\n\nfemale:{\n    ${data.female.join(' ')}\n}`;
+        document.getElementById('namesInput').value = txt;
+    }
+}
+
+function switchTab(tab, tabName) {
+    // UI
+    const mainTabs = document.querySelectorAll('.tabs.is-toggle > ul > li');
+    mainTabs.forEach(t => t.classList.remove('is-active'));
+    tab.classList.add('is-active');
+
+    // Content
+    const contents = document.querySelectorAll('#tab-random, #tab-barbara');
+    contents.forEach(c => c.classList.add('is-hidden'));
+    document.getElementById(`tab-${tabName}`).classList.remove('is-hidden');
+    
+    // Button Logic
+    document.getElementById('generateRandomBtn').classList.add('is-hidden');
+    document.getElementById('generateBarbaraBtn').classList.add('is-hidden');
+    
+    if (tabName === 'random') {
+        document.getElementById('generateRandomBtn').classList.remove('is-hidden');
+    } else if (tabName === 'barbara') {
+        document.getElementById('generateBarbaraBtn').classList.remove('is-hidden');
+    }
+    
+    currentTab = tabName;
+}
+
+function switchSubTab(tab, tabName) {
+    // UI
+    const subTabs = document.querySelectorAll('#tab-random .tabs.is-toggle > ul > li');
+    subTabs.forEach(t => t.classList.remove('is-active'));
+    tab.classList.add('is-active');
+
+    // Content
+    const contents = document.querySelectorAll('#subtab-education, #subtab-personality, #subtab-congenital, #subtab-manual');
+    contents.forEach(c => c.classList.add('is-hidden'));
+    document.getElementById(`subtab-${tabName}`).classList.remove('is-hidden');
+    
+    currentSubTab = tabName;
+}
+
+
+function toggleTrait(el, id) {
+    if (selectedTraits.has(id)) {
+        selectedTraits.delete(id);
+        el.classList.remove('selected');
+    } else {
+        selectedTraits.add(id);
+        el.classList.add('selected');
+    }
+}
+
+function generateCharacters() {
+    // Gather Config
+    const config = {
+        numChars: parseInt(getElementVal('numChars')),
+        startYear: parseInt(getElementVal('startYear')),
+        femalePercent: parseInt(getElementVal('femalePercent')),
+        culture: getElementVal('culture'),
+        religion: getElementVal('religion'),
+        minAge: parseInt(getElementVal('minAge')),
+        maxAge: parseInt(getElementVal('maxAge')),
+        minDateRange: parseInt(getElementVal('minDateRange')),
+        maxDateRange: parseInt(getElementVal('maxDateRange')),
+        maxTraits: parseInt(getElementVal('maxTraits')),
+        dnaOverride: getElementVal('dnaSelect') // New: DNA override selection
+    };
+
+    // Gather Data
+    const rawNames = document.getElementById('namesInput').value;
+    const nameLists = parseNames(rawNames);
+    
+    // Combine Manual Traits + Visual Traits
+    const manualTraits = getManualTraits();
+    const visualTraits = Array.from(selectedTraits);
+    const traitPool = [...manualTraits, ...visualTraits];
+
+    // Generate
+    let output = "\ufeff"; // BOM for UTF-8
+    
+    for (let i = 0; i < config.numChars; i++) {
+        const char = new Character(i, config, nameLists, traitPool);
+        output += char.generateString();
+    }
+
+    document.getElementById('outputArea').value = output;
+}
+
+
+function generateBarbara() {
+    // Gather Config from Barbara Editor
+    const charID = getElementVal('barbaraIDSelect');
+    const name = getElementVal('barbaraName');
+    const culture = getElementVal('barbaraCulture');
+    const religion = getElementVal('barbaraReligion');
+    const birthDate = getElementVal('barbaraBirth');
+    const deathDate = getElementVal('barbaraDeath');
+    const dynasty = getElementVal('barbaraDynasty');
+    const nickname = getElementVal('barbaraNickname');
+    let customDNA = getElementVal('barbaraCustomDNAInput').trim();
+    
+    // Attributes
+    const martial = getElementVal('barbaraMartial');
+    const stewardship = getElementVal('barbaraStewardship');
+    const diplomacy = getElementVal('barbaraDiplomacy');
+    const intrigue = getElementVal('barbaraIntrigue');
+    const prowess = getElementVal('barbaraProwess');
+    
+    // Traits
+    const rawTraits = document.getElementById('barbaraTraitsInput').value;
+    const traits = rawTraits.split('\n').map(t => t.trim()).filter(t => t.length > 0);
+
+    let str = "\ufeff"; // BOM for UTF-8
+
+    // 1. Handle Custom DNA block (for yaseen_dna.txt)
+    if (customDNA.length > 0) {
+        
+        let finalDnaBlock;
+
+        // Check if the input is likely just the inner genes block
+        if (!customDNA.includes('yaseen_dna = {') && (customDNA.includes('genes={') || customDNA.includes('hair_color='))) {
+            // User provided only the genes block or internal portrait info.
+            
+            // We use the existing YASEEN_DNA_STRUCTURE as a template and replace its internal genes block.
+            // Find the start of the existing genes block in the template
+            const genesStart = YASEEN_DNA_STRUCTURE.indexOf('genes={');
+            const portraitEnd = YASEEN_DNA_STRUCTURE.indexOf('}', YASEEN_DNA_STRUCTURE.indexOf('portrait_info = {'));
+            
+            if (genesStart !== -1) {
+                // If genes = { is found in the custom input, we assume the user copied the genes block and replace the internal structure
+                // We simplify the wrapping to just assume the user is pasting the genes=... block.
+                
+                // Reconstruct the standard female DNA block with the user's custom genes
+                finalDnaBlock = `yaseen_dna = {
+	portrait_info = {
+		type=female
+		${customDNA}
+	}
+	
+	enabled = yes
+}`;
+
+            } else {
+                 // The user pasted something but it doesn't look like a standard full DNA block OR a genes block.
+                 finalDnaBlock = customDNA;
+            }
+
+        } else {
+            // User provided the full correct block (or something close enough that we should just output raw).
+            finalDnaBlock = customDNA;
+        }
+
+
+        str += `# =========================================================================\n`;
+        str += `# >>> PASTE THIS BLOCK INTO your MOD's DNA FILE (e.g., yaseen_dna.txt) <<<\n`;
+        str += `# =========================================================================\n`;
+        str += `${finalDnaBlock}\n\n`;
+    }
+
+    // 2. Add Character block (for history file)
+    str += `# =========================================================================\n`;
+    str += `# >>> PASTE THIS BLOCK INTO A CHARACTER HISTORY FILE (e.g., 867_characters.txt) <<<\n`;
+    str += `# =========================================================================\n`;
+    str += `${charID} = { # ${name} of the ${dynasty} Dynasty\n`;
+    str += `\tname = "${name}"\n`;
+    
+    // Reference DNA by ID 'yaseen_dna' if a custom block was provided
+    if (customDNA.length > 0) {
+        str += `\tdna = yaseen_dna\n`;
+    }
+    
+    str += `\tdynasty = ${dynasty}\n`;
+    str += `\treligion = "${religion}"\n`;
+    str += `\tculture = "${culture}"\n`;
+    str += `\tmartial = ${martial}\n`;
+    str += `\tstewardship = ${stewardship}\n`;
+    str += `\tdiplomacy = ${diplomacy}\n`;
+    str += `\tintrigue = ${intrigue}\n`;
+    str += `\tprowess = ${prowess}\n`;
+    
+    traits.forEach(t => {
+        str += `\ttrait = ${t}\n`;
+    });
+    
+    str += `\tdisallow_random_traits = yes\n`; // Always present for this scripted character
+
+    // Birth Event
+    str += `\n\t${birthDate} = {\n`;
+    str += `\t\tbirth = yes\n`;
+    str += `\t}\n`;
+
+    // Female
+    str += `\tfemale = yes\n`;
+
+    // Death Event 
+    str += `\n\t${deathDate} = {\n`;
+    str += `\t\tdeath = yes\n`;
+    if (nickname) {
+        str += `\t\tgive_nickname = ${nickname}\n`;
+    }
+    str += `\t}\n`;
+    str += `}\n\n`;
+
+    document.getElementById('outputArea').value = str;
+}
+
+
+function copyToClipboard() {
+    const copyText = document.getElementById("outputArea");
+    copyText.select();
+    document.execCommand("copy");
+}
+
+function downloadFile() {
+    const text = document.getElementById("outputArea").value;
+    const element = document.createElement('a');
+    element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+    element.setAttribute('download', "history_characters.txt");
+    document.body.appendChild(element);
+    element.click();
+    document.body.removeChild(element);
+}
+
+function toggleSection(id) {
+    const el = document.getElementById(id);
+    const arrow = document.getElementById('dataArrow');
+    el.classList.toggle('is-hidden');
+    arrow.firstElementChild.classList.toggle('fa-chevron-up');
+    arrow.firstElementChild.classList.toggle('fa-chevron-down');
+}
+
+window.onload = initUI;
+
+</script>
+</body>
+</html>
