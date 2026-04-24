@@ -6,181 +6,25 @@
     <title>CK3 History Generator</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Lato:wght@400;700&display=swap');
-        
-        :root {
-            --ck3-gold: #d4af37;
-            --ck3-dark: #1a1a2e;
-            --ck3-panel: #232528;
-            --ck3-border: #444;
-            --ck3-text: #e5e5e5;
-        }
 
-        body {
-            font-family: 'Lato', sans-serif;
-            background-color: var(--ck3-dark);
-            color: var(--ck3-text);
-            min-height: 100vh;
-            /* Subtle pattern from new.zip styles */
-            background-image: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40"%3E%3Cg fill-rule="evenodd"%3E%3Cg fill="%2316213e" fill-opacity="0.4"%3E%3Cpath d="M0 38.59l2.83-2.83 1.41 1.41L1.41 40H0v-1.41zM0 1.4l2.83 2.83 1.41-1.41L1.41 0H0v1.41zM38.59 40l-2.83-2.83 1.41-1.41L40 38.59V40h-1.41zM40 1.41l-2.83 2.83-1.41-1.41L38.59 0H..."%3E%3C/path%3E%3C/g%3E%3C/g%3E%3C/svg%3E');
-        }
-        
-        h1, h2, h3, .ck3-font, .title {
-            font-family: 'Cinzel', serif;
-        }
-
-        /* Overrides */
-        .box {
-            background-color: var(--ck3-panel);
-            border: 1px solid var(--ck3-border);
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
-            color: var(--ck3-text);
-        }
-
-        .label {
-            color: #a3a3a3;
-            font-size: 0.875rem;
-        }
-
-        .input, .textarea, .select select {
-            background-color: #16181c;
-            border-color: var(--ck3-border);
-            color: var(--ck3-text);
-            transition: border-color 0.2s;
-        }
-
-        .input:focus, .textarea:focus, .select select:focus {
-            border-color: var(--ck3-gold);
-            box-shadow: 0 0 0 0.125em rgba(212, 175, 55, 0.25);
-        }
-
-        .btn-gold {
-            background: linear-gradient(to bottom, #d4af37, #b4941f);
-            color: #1a1a1a !important;
-            font-weight: bold;
-            border: 1px solid #8a6d0b;
-            text-shadow: 0 1px 0 rgba(255,255,255,0.2);
-            transition: all 0.2s;
-        }
-
-        .btn-gold:hover {
-            filter: brightness(1.1);
-            transform: translateY(-1px);
-        }
-
-        .header-gold {
-            color: var(--ck3-gold);
-            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
-        }
-
-        .section-header {
-            color: var(--ck3-gold);
-            border-bottom: 1px solid #4a4a4a;
-            padding-bottom: 0.5rem;
-            margin-bottom: 1rem;
-            font-size: 1.25rem;
-            font-weight: bold;
-        }
-
-        .output-area {
-            background-color: #111;
-            color: #48c774; 
-            font-family: monospace;
-            border: none;
-            resize: none;
-            height: 600px;
-        }
-
-        /* Trait Grid Styles */
-        .trait-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
-            gap: 0.5rem;
-            max-height: 300px;
-            overflow-y: auto;
-            padding: 0.5rem;
-            background: #16181c;
-            border: 1px solid #444;
-            border-radius: 4px;
-        }
-
-        .trait-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            cursor: pointer;
-            padding: 4px;
-            border-radius: 4px;
-            transition: background 0.2s;
-            position: relative;
-        }
-
-        .trait-item:hover {
-            background: #333;
-        }
-
-        .trait-item.selected {
-            background: rgba(212, 175, 55, 0.2);
-            border: 1px solid var(--ck3-gold);
-        }
-
-        .trait-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 4px;
-        }
-
-        .trait-tooltip {
-            font-size: 0.7rem;
-            text-align: center;
-            margin-top: 2px;
-            line-height: 1.1;
-            color: #ccc;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            width: 100%;
-        }
-
-        /* Tabs */
-        .tabs.is-toggle li.is-active a {
-            background-color: var(--ck3-gold);
-            border-color: var(--ck3-gold);
-            color: #1a1a1a;
-            font-weight: bold;
-        }
-        .tabs.is-toggle a {
-            background-color: var(--ck3-panel);
-            border-color: #444;
-            color: #aaa;
-        }
-        .tabs.is-toggle a:hover {
-            background-color: #333;
-            color: #fff;
-        }
-
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #1a1a1a; }
-        ::-webkit-scrollbar-thumb { background: #404040; border-radius: 4px; }
-    </style>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
     <section class="section pt-4">
         <div class="container">
             
-            <div class="has-text-centered mb-5">
-                <h1 class="title is-2 header-gold">CK3 History Generator</h1>
-                <p class="subtitle has-text-grey-light is-6">Generate historical character files compatible with Crusader Kings 3.</p>
+            <div class="has-text-centered mb-6">
+                <h1 class="title is-1 header-gold mb-2">CK3 History Generator</h1>
+                <p class="subtitle is-6" style="color: var(--ck3-text-dim);">Historical Character & Script Designer</p>
             </div>
 
             <div class="columns">
                 
                 <div class="column is-one-third">
                     
-                    <div class="box">
-                        <h2 class="section-header"><i class="fas fa-cog mr-2"></i> Settings</h2>
+                    <div class="box shadow-depth">
+                        <h2 class="section-header"><i class="fas fa-crown mr-2"></i> Realm Settings</h2>
                         
                         <div class="columns is-mobile mb-2">
                             <div class="column">
@@ -261,7 +105,7 @@
                         </div>
                     </div>
 
-                    <button onclick="generateCharacters()" class="button btn-gold is-fullwidth is-medium mb-4" id="generateRandomBtn">
+                    <button onclick="generateCharacters()" class="button btn-gold is-fullwidth is-large mb-4" id="generateRandomBtn">
                         <span class="icon"><i class="fas fa-scroll"></i></span>
                         <span>Generate History File</span>
                     </button>
@@ -386,27 +230,27 @@ violet_poet</textarea>
                         </div>
                         </div>
 
-                    <div class="box p-0" style="overflow: hidden; display: flex; flex-direction: column; height: 500px;">
-                        <div class="p-3" style="background-color: var(--ck3-panel); border-bottom: 1px solid #444;">
-                            <div class="level is-mobile m-0">
+                    <div class="box p-0 output-container shadow-depth" style="height: 600px; display: flex; flex-direction: column;">
+                        <div class="output-header p-4">
+                            <div class="level is-mobile m-0 w-100">
                                 <div class="level-left">
-                                    <h2 class="title is-5 mb-0 header-gold"><i class="fas fa-code mr-2"></i> Output Code</h2>
+                                    <h2 class="title is-4 mb-0" style="text-align: left; color: var(--ck3-gold);"><i class="fas fa-terminal mr-2"></i> Script Output</h2>
                                 </div>
                                 <div class="level-right">
-                                    <div class="buttons are-small">
-                                        <button onclick="copyToClipboard()" class="button is-dark">
+                                    <div class="buttons">
+                                        <button onclick="copyToClipboard()" class="button is-dark is-outlined" style="border-color: var(--ck3-gold); color: var(--ck3-gold);">
                                             <span class="icon"><i class="fas fa-copy"></i></span>
-                                            <span>Copy</span>
+                                            <span>Copy Script</span>
                                         </button>
-                                        <button onclick="downloadFile()" class="button is-dark">
-                                            <span class="icon"><i class="fas fa-download"></i></span>
-                                            <span>.txt</span>
+                                        <button onclick="downloadFile()" class="button is-dark is-outlined" style="border-color: var(--ck3-gold); color: var(--ck3-gold);">
+                                            <span class="icon"><i class="fas fa-file-download"></i></span>
+                                            <span>Download</span>
                                         </button>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <textarea id="outputArea" class="textarea output-area p-4" readonly placeholder="Generated character code will appear here..."></textarea>
+                        <textarea id="outputArea" class="textarea output-area p-5" readonly placeholder="Historical script will manifest here..."></textarea>
                     </div>
 
                 </div>
@@ -575,94 +419,118 @@ const CULTURE_DB = {
 // ==========================================
 // Helper to clean IDs from file paths in the CSV data
 function extractIdFromUrl(url) {
-    const filename = url.substring(url.lastIndexOf('/') + 1);
-    let id = filename.replace('.png', '').replace('60px-', '').replace('24px-', '');
-    if (id.startsWith('Trait_')) id = id.substring(6);
-    return id.toLowerCase();
+    if (!url || typeof url !== 'string') return 'unknown';
+    try {
+        const filename = url.substring(url.lastIndexOf('/') + 1);
+        let id = filename.replace('.png', '').replace('60px-', '').replace('24px-', '');
+        if (id.startsWith('Trait_')) id = id.substring(6);
+        return id.toLowerCase();
+    } catch (e) {
+        console.error('Error extracting ID from URL:', url, e);
+        return 'error';
+    }
 }
 
 const TRAIT_DB = {
     education: [
-        {n: "Naive Appeaser", img: "https://ck3.paradoxwikis.com/images/thumb/7/7d/Trait_education_diplomacy_1.png/24px-Trait_education_diplomacy_1.png"},
-        {n: "Adequate Bargainer", img: "https://ck3.paradoxwikis.com/images/thumb/b/ba/Trait_education_diplomacy_2.png/24px-Trait_education_diplomacy_2.png"},
-        {n: "Charismatic Negotiator", img: "https://ck3.paradoxwikis.com/images/thumb/a/a3/Trait_education_diplomacy_3.png/24px-Trait_education_diplomacy_3.png"},
-        {n: "Grey Eminence", img: "https://ck3.paradoxwikis.com/images/thumb/1/19/Trait_education_diplomacy_4.png/24px-Trait_education_diplomacy_4.png"},
-        {n: "Misguided Warrior", img: "https://ck3.paradoxwikis.com/images/thumb/8/8a/Trait_education_martial_1.png/24px-Trait_education_martial_1.png"},
-        {n: "Tough Soldier", img: "https://ck3.paradoxwikis.com/images/thumb/2/25/Trait_education_martial_2.png/24px-Trait_education_martial_2.png"},
-        {n: "Skilled Tactician", img: "https://ck3.paradoxwikis.com/images/thumb/0/03/Trait_education_martial_3.png/24px-Trait_education_martial_3.png"},
-        {n: "Brilliant Strategist", img: "https://ck3.paradoxwikis.com/images/thumb/6/6c/Trait_education_martial_4.png/24px-Trait_education_martial_4.png"},
-        {n: "Indulgent Wastrel", img: "https://ck3.paradoxwikis.com/images/thumb/f/f6/Trait_education_stewardship_1.png/24px-Trait_education_stewardship_1.png"},
-        {n: "Thrifty Clerk", img: "https://ck3.paradoxwikis.com/images/thumb/2/2a/Trait_education_stewardship_2.png/24px-Trait_education_stewardship_2.png"},
-        {n: "Fortune Builder", img: "https://ck3.paradoxwikis.com/images/thumb/9/91/Trait_education_stewardship_3.png/24px-Trait_education_stewardship_3.png"},
-        {n: "Midas Touched", img: "https://ck3.paradoxwikis.com/images/thumb/8/8f/Trait_education_stewardship_4.png/24px-Trait_education_stewardship_4.png"},
-        {n: "Amateurish Plotter", img: "https://ck3.paradoxwikis.com/images/thumb/b/ba/Trait_education_intrigue_1.png/24px-Trait_education_intrigue_1.png"},
-        {n: "Flamboyant Trickster", img: "https://ck3.paradoxwikis.com/images/thumb/e/e8/Trait_education_intrigue_2.png/24px-Trait_education_intrigue_2.png"},
-        {n: "Intricate Webweaver", img: "https://ck3.paradoxwikis.com/images/thumb/a/ad/Trait_education_intrigue_3.png/24px-Trait_education_intrigue_3.png"},
-        {n: "Elusive Shadow", img: "https://ck3.paradoxwikis.com/images/thumb/1/17/Trait_education_intrigue_4.png/24px-Trait_education_intrigue_4.png"},
-        {n: "Conscientious Scribe", img: "https://ck3.paradoxwikis.com/images/thumb/b/b0/Trait_education_learning_1.png/24px-Trait_education_learning_1.png"},
-        {n: "Insightful Thinker", img: "https://ck3.paradoxwikis.com/images/thumb/5/5d/Trait_education_learning_2.png/24px-Trait_education_learning_2.png"},
-        {n: "Astute Intellectual", img: "https://ck3.paradoxwikis.com/images/thumb/e/e1/Trait_education_learning_3.png/24px-Trait_education_learning_3.png"},
-        {n: "Mastermind Philosopher", img: "https://ck3.paradoxwikis.com/images/thumb/a/a0/Trait_education_learning_4.png/24px-Trait_education_learning_4.png"}
+        {n: "Diplomacy 1", img: "https://ck3.paradoxwikis.com/images/7/7d/Trait_education_diplomacy_1.png", id: "education_diplomacy_1"},
+        {n: "Diplomacy 2", img: "https://ck3.paradoxwikis.com/images/b/ba/Trait_education_diplomacy_2.png", id: "education_diplomacy_2"},
+        {n: "Diplomacy 3", img: "https://ck3.paradoxwikis.com/images/a/a3/Trait_education_diplomacy_3.png", id: "education_diplomacy_3"},
+        {n: "Diplomacy 4", img: "https://ck3.paradoxwikis.com/images/1/19/Trait_education_diplomacy_4.png", id: "education_diplomacy_4"},
+        {n: "Martial 1", img: "https://ck3.paradoxwikis.com/images/8/8a/Trait_education_martial_1.png", id: "education_martial_1"},
+        {n: "Martial 2", img: "https://ck3.paradoxwikis.com/images/2/25/Trait_education_martial_2.png", id: "education_martial_2"},
+        {n: "Martial 3", img: "https://ck3.paradoxwikis.com/images/8/8b/Trait_education_martial_3.png", id: "education_martial_3"},
+        {n: "Martial 4", img: "https://ck3.paradoxwikis.com/images/1/12/Trait_education_martial_4.png", id: "education_martial_4"},
+        {n: "Stewardship 1", img: "https://ck3.paradoxwikis.com/images/8/89/Trait_education_stewardship_1.png", id: "education_stewardship_1"},
+        {n: "Stewardship 2", img: "https://ck3.paradoxwikis.com/images/7/7d/Trait_education_stewardship_2.png", id: "education_stewardship_2"},
+        {n: "Stewardship 3", img: "https://ck3.paradoxwikis.com/images/9/91/Trait_education_stewardship_3.png", id: "education_stewardship_3"},
+        {n: "Stewardship 4", img: "https://ck3.paradoxwikis.com/images/8/8f/Trait_education_stewardship_4.png", id: "education_stewardship_4"},
+        {n: "Intrigue 1", img: "https://ck3.paradoxwikis.com/images/b/ba/Trait_education_intrigue_1.png", id: "education_intrigue_1"},
+        {n: "Intrigue 2", img: "https://ck3.paradoxwikis.com/images/e/e8/Trait_education_intrigue_2.png", id: "education_intrigue_2"},
+        {n: "Intrigue 3", img: "https://ck3.paradoxwikis.com/images/a/ad/Trait_education_intrigue_3.png", id: "education_intrigue_3"},
+        {n: "Intrigue 4", img: "https://ck3.paradoxwikis.com/images/1/17/Trait_education_intrigue_4.png", id: "education_intrigue_4"},
+        {n: "Learning 1", img: "https://ck3.paradoxwikis.com/images/b/b1/Trait_education_learning_1.png", id: "education_learning_1"},
+        {n: "Learning 2", img: "https://ck3.paradoxwikis.com/images/3/3f/Trait_education_learning_2.png", id: "education_learning_2"},
+        {n: "Learning 3", img: "https://ck3.paradoxwikis.com/images/5/5a/Trait_education_learning_3.png", id: "education_learning_3"},
+        {n: "Learning 4", img: "https://ck3.paradoxwikis.com/images/6/6f/Trait_education_learning_4.png", id: "education_learning_4"}
     ],
     personality: [
-        {n: "Ambitious", img: "https://ck3.paradoxwikis.com/images/d/df/Trait_ambitious.png"},
-        {n: "Arbitrary", img: "https://ck3.paradoxwikis.com/images/6/67/Trait_arbitrary.png"},
-        {n: "Arrogant", img: "https://ck3.paradoxwikis.com/images/c/c0/Trait_arrogant.png"},
-        {n: "Brave", img: "https://ck3.paradoxwikis.com/images/c/c8/Trait_brave.png"},
-        {n: "Callous", img: "https://ck3.paradoxwikis.com/images/d/d1/Trait_callous.png"},
-        {n: "Calm", img: "https://ck3.paradoxwikis.com/images/6/69/Trait_calm.png"},
-        {n: "Chaste", img: "https://ck3.paradoxwikis.com/images/2/26/Trait_chaste.png"},
-        {n: "Compassionate", img: "https://ck3.paradoxwikis.com/images/5/5c/Trait_compassionate.png"},
-        {n: "Content", img: "https://ck3.paradoxwikis.com/images/2/28/Trait_content.png"},
-        {n: "Craven", img: "https://ck3.paradoxwikis.com/images/0/04/Trait_craven.png"},
-        {n: "Cynical", img: "https://ck3.paradoxwikis.com/images/c/c8/Trait_cynical.png"},
-        {n: "Deceitful", img: "https://ck3.paradoxwikis.com/images/4/47/Trait_deceitful.png"},
-        {n: "Diligent", img: "https://ck3.paradoxwikis.com/images/2/22/Trait_diligent.png"},
-        {n: "Forgiving", img: "https://ck3.paradoxwikis.com/images/2/2a/Trait_forgiving.png"},
-        {n: "Generous", img: "https://ck3.paradoxwikis.com/images/9/9f/Trait_generous.png"},
-        {n: "Gluttonous", img: "https://ck3.paradoxwikis.com/images/b/b7/Trait_gluttonous.png"},
-        {n: "Greedy", img: "https://ck3.paradoxwikis.com/images/1/19/Trait_greedy.png"},
-        {n: "Gregarious", img: "https://ck3.paradoxwikis.com/images/3/31/Trait_gregarious.png"},
-        {n: "Honest", img: "https://ck3.paradoxwikis.com/images/c/cf/Trait_honest.png"},
-        {n: "Humble", img: "https://ck3.paradoxwikis.com/images/3/37/Trait_humble.png"},
-        {n: "Impatient", img: "https://ck3.paradoxwikis.com/images/4/42/Trait_impatient.png"},
-        {n: "Just", img: "https://ck3.paradoxwikis.com/images/b/b4/Trait_just.png"},
-        {n: "Lazy", img: "https://ck3.paradoxwikis.com/images/a/a7/Trait_lazy.png"},
-        {n: "Lustful", img: "https://ck3.paradoxwikis.com/images/e/ed/Trait_lustful.png"},
-        {n: "Paranoid", img: "https://ck3.paradoxwikis.com/images/5/52/Trait_paranoid.png"},
-        {n: "Patient", img: "https://ck3.paradoxwikis.com/images/a/af/Trait_patient.png"},
-        {n: "Sadistic", img: "https://ck3.paradoxwikis.com/images/d/dd/Trait_sadistic.png"},
-        {n: "Shy", img: "https://ck3.paradoxwikis.com/images/f/f0/Trait_shy.png"},
-        {n: "Stubborn", img: "https://ck3.paradoxwikis.com/images/a/a2/Trait_stubborn.png"},
-        {n: "Temperate", img: "https://ck3.paradoxwikis.com/images/9/92/Trait_temperate.png"},
-        {n: "Trusting", img: "https://ck3.paradoxwikis.com/images/0/00/Trait_trusting.png"},
-        {n: "Vengeful", img: "https://ck3.paradoxwikis.com/images/f/f5/Trait_vengeful.png"},
-        {n: "Wrathful", img: "https://ck3.paradoxwikis.com/images/5/5d/Trait_wrathful.png"},
-        {n: "Zealous", img: "https://ck3.paradoxwikis.com/images/2/23/Trait_zealous.png"}
+        {n: "Ambitious", img: "https://ck3.paradoxwikis.com/images/d/df/Trait_ambitious.png", id: "ambitious"},
+        {n: "Arbitrary", img: "https://ck3.paradoxwikis.com/images/6/67/Trait_arbitrary.png", id: "arbitrary"},
+        {n: "Arrogant", img: "https://ck3.paradoxwikis.com/images/c/c0/Trait_arrogant.png", id: "arrogant"},
+        {n: "Brave", img: "https://ck3.paradoxwikis.com/images/c/c8/Trait_brave.png", id: "brave"},
+        {n: "Callous", img: "https://ck3.paradoxwikis.com/images/d/d1/Trait_callous.png", id: "callous"},
+        {n: "Calm", img: "https://ck3.paradoxwikis.com/images/6/69/Trait_calm.png", id: "calm"},
+        {n: "Chaste", img: "https://ck3.paradoxwikis.com/images/2/26/Trait_chaste.png", id: "chaste"},
+        {n: "Compassionate", img: "https://ck3.paradoxwikis.com/images/5/5c/Trait_compassionate.png", id: "compassionate"},
+        {n: "Content", img: "https://ck3.paradoxwikis.com/images/2/28/Trait_content.png", id: "content"},
+        {n: "Craven", img: "https://ck3.paradoxwikis.com/images/0/04/Trait_craven.png", id: "craven"},
+        {n: "Cynical", img: "https://ck3.paradoxwikis.com/images/c/c8/Trait_cynical.png", id: "cynical"},
+        {n: "Deceitful", img: "https://ck3.paradoxwikis.com/images/2/20/Trait_deceitful.png", id: "deceitful"},
+        {n: "Diligent", img: "https://ck3.paradoxwikis.com/images/4/4a/Trait_diligent.png", id: "diligent"},
+        {n: "Fickle", img: "https://ck3.paradoxwikis.com/images/7/7d/Trait_fickle.png", id: "fickle"},
+        {n: "Forgiving", img: "https://ck3.paradoxwikis.com/images/e/e7/Trait_forgiving.png", id: "forgiving"},
+        {n: "Generous", img: "https://ck3.paradoxwikis.com/images/9/9f/Trait_generous.png", id: "generous"},
+        {n: "Gluttonous", img: "https://ck3.paradoxwikis.com/images/b/b7/Trait_gluttonous.png", id: "gluttonous"},
+        {n: "Greedy", img: "https://ck3.paradoxwikis.com/images/1/19/Trait_greedy.png", id: "greedy"},
+        {n: "Gregarious", img: "https://ck3.paradoxwikis.com/images/3/31/Trait_gregarious.png", id: "gregarious"},
+        {n: "Honest", img: "https://ck3.paradoxwikis.com/images/c/cf/Trait_honest.png", id: "honest"},
+        {n: "Humble", img: "https://ck3.paradoxwikis.com/images/3/37/Trait_humble.png", id: "humble"},
+        {n: "Impatient", img: "https://ck3.paradoxwikis.com/images/4/42/Trait_impatient.png", id: "impatient"},
+        {n: "Just", img: "https://ck3.paradoxwikis.com/images/b/b4/Trait_just.png", id: "just"},
+        {n: "Lazy", img: "https://ck3.paradoxwikis.com/images/a/a7/Trait_lazy.png", id: "lazy"},
+        {n: "Lustful", img: "https://ck3.paradoxwikis.com/images/e/ed/Trait_lustful.png", id: "lustful"},
+        {n: "Paranoid", img: "https://ck3.paradoxwikis.com/images/5/52/Trait_paranoid.png", id: "paranoid"},
+        {n: "Patient", img: "https://ck3.paradoxwikis.com/images/a/af/Trait_patient.png", id: "patient"},
+        {n: "Sadistic", img: "https://ck3.paradoxwikis.com/images/9/90/Trait_sadistic.png", id: "sadistic"},
+        {n: "Shy", img: "https://ck3.paradoxwikis.com/images/2/28/Trait_shy.png", id: "shy"},
+        {n: "Stubborn", img: "https://ck3.paradoxwikis.com/images/4/4e/Trait_stubborn.png", id: "stubborn"},
+        {n: "Temperate", img: "https://ck3.paradoxwikis.com/images/a/a9/Trait_temperate.png", id: "temperate"},
+        {n: "Trusting", img: "https://ck3.paradoxwikis.com/images/f/f0/Trait_trusting.png", id: "trusting"},
+        {n: "Vengeful", img: "https://ck3.paradoxwikis.com/images/4/4a/Trait_vengeful.png", id: "vengeful"},
+        {n: "Wrathful", img: "https://ck3.paradoxwikis.com/images/4/42/Trait_wrathful.png", id: "wrathful"},
+        {n: "Zealous", img: "https://ck3.paradoxwikis.com/images/8/8d/Trait_zealous.png", id: "zealous"},
+        {n: "Eccentric", img: "https://ck3.paradoxwikis.com/images/3/3d/Trait_eccentric.png", id: "eccentric"}
     ],
     congenital: [
-        {n: "Albino", img: "https://ck3.paradoxwikis.com/images/thumb/b/bb/Trait_albino.png/60px-Trait_albino.png"},
-        {n: "Bleeder", img: "https://ck3.paradoxwikis.com/images/thumb/3/36/Trait_bleeder.png/60px-Trait_bleeder.png"},
-        {n: "Club-footed", img: "https://ck3.paradoxwikis.com/images/thumb/4/4f/Trait_clubfooted.png/60px-Trait_clubfooted.png"},
-        {n: "Dwarf", img: "https://ck3.paradoxwikis.com/images/thumb/c/cc/Trait_dwarf.png/60px-Trait_dwarf.png"},
-        {n: "Fecund", img: "https://ck3.paradoxwikis.com/images/thumb/7/72/Trait_fecund.png/60px-Trait_fecund.png"},
-        {n: "Giant", img: "https://ck3.paradoxwikis.com/images/thumb/9/99/Trait_giant.png/60px-Trait_giant.png"},
-        {n: "Hunchbacked", img: "https://ck3.paradoxwikis.com/images/thumb/d/df/Trait_hunchbacked.png/60px-Trait_hunchbacked.png"},
-        {n: "Lisping", img: "https://ck3.paradoxwikis.com/images/thumb/b/b3/Trait_lisping.png/60px-Trait_lisping.png"},
-        {n: "Genius", img: "https://ck3.paradoxwikis.com/images/thumb/6/63/Trait_intellect_good_3.png/60px-Trait_intellect_good_3.png"},
-        {n: "Intelligent", img: "https://ck3.paradoxwikis.com/images/thumb/e/e5/Trait_intellect_good_2.png/60px-Trait_intellect_good_2.png"},
-        {n: "Quick", img: "https://ck3.paradoxwikis.com/images/thumb/2/27/Trait_intellect_good_1.png/60px-Trait_intellect_good_1.png"},
-        {n: "Imbecile", img: "https://ck3.paradoxwikis.com/images/thumb/0/09/Trait_intellect_bad_3.png/60px-Trait_intellect_bad_3.png"},
-        {n: "Stupid", img: "https://ck3.paradoxwikis.com/images/thumb/e/e3/Trait_intellect_bad_2.png/60px-Trait_intellect_bad_2.png"},
-        {n: "Slow", img: "https://ck3.paradoxwikis.com/images/thumb/d/d6/Trait_intellect_bad_1.png/60px-Trait_intellect_bad_1.png"},
-        {n: "Beautiful", img: "https://ck3.paradoxwikis.com/images/thumb/c/cb/Trait_beauty_good_3.png/60px-Trait_beauty_good_3.png"},
-        {n: "Handsome", img: "https://ck3.paradoxwikis.com/images/thumb/3/36/Trait_beauty_good_2.png/60px-Trait_beauty_good_2.png"},
-        {n: "Comely", img: "https://ck3.paradoxwikis.com/images/thumb/9/90/Trait_beauty_good_1.png/60px-Trait_beauty_good_1.png"},
-        {n: "Herculean", img: "https://ck3.paradoxwikis.com/images/thumb/7/76/Trait_physique_good_3.png/60px-Trait_physique_good_3.png"},
-        {n: "Robust", img: "https://ck3.paradoxwikis.com/images/thumb/1/1a/Trait_physique_good_2.png/60px-Trait_physique_good_2.png"},
-        {n: "Hale", img: "https://ck3.paradoxwikis.com/images/thumb/9/9b/Trait_physique_good_1.png/60px-Trait_physique_good_1.png"}
+        {n: "Albino", img: "https://ck3.paradoxwikis.com/images/b/bb/Trait_albino.png", id: "albino"},
+        {n: "Bleeder", img: "https://ck3.paradoxwikis.com/images/3/36/Trait_bleeder.png", id: "bleeder"},
+        {n: "Club-footed", img: "https://ck3.paradoxwikis.com/images/4/4f/Trait_clubfooted.png", id: "clubfooted"},
+        {n: "Dwarf", img: "https://ck3.paradoxwikis.com/images/c/cc/Trait_dwarf.png", id: "dwarf"},
+        {n: "Fecund", img: "https://ck3.paradoxwikis.com/images/7/72/Trait_fecund.png", id: "fecund"},
+        {n: "Giant", img: "https://ck3.paradoxwikis.com/images/9/99/Trait_giant.png", id: "giant"},
+        {n: "Hunchbacked", img: "https://ck3.paradoxwikis.com/images/d/df/Trait_hunchbacked.png", id: "hunchbacked"},
+        {n: "Lisping", img: "https://ck3.paradoxwikis.com/images/b/b3/Trait_lisping.png", id: "lisping"},
+        {n: "Lunatic", img: "https://ck3.paradoxwikis.com/images/d/d9/Trait_lunatic.png", id: "lunatic"},
+        {n: "Melancholic", img: "https://ck3.paradoxwikis.com/images/1/1c/Trait_depressed.png", id: "depressed"},
+        {n: "Possessed", img: "https://ck3.paradoxwikis.com/images/0/08/Trait_possessed.png", id: "possessed"},
+        {n: "Pure-blooded", img: "https://ck3.paradoxwikis.com/images/d/d4/Trait_pure_blooded.png", id: "pure_blooded"},
+        {n: "Scaly", img: "https://ck3.paradoxwikis.com/images/7/72/Trait_scaly.png", id: "scaly"},
+        {n: "Spindly", img: "https://ck3.paradoxwikis.com/images/3/3f/Trait_spindly.png", id: "spindly"},
+        {n: "Sterile", img: "https://ck3.paradoxwikis.com/images/a/ae/Trait_infertile.png", id: "infertile"},
+        {n: "Stuttering", img: "https://ck3.paradoxwikis.com/images/9/9b/Trait_stuttering.png", id: "stuttering"},
+        {n: "Wheezing", img: "https://ck3.paradoxwikis.com/images/7/7f/Trait_wheezing.png", id: "wheezing"},
+        {n: "Imbecile", img: "https://ck3.paradoxwikis.com/images/7/75/Trait_intellect_bad_3.png", id: "intellect_bad_3"},
+        {n: "Stupid", img: "https://ck3.paradoxwikis.com/images/e/e6/Trait_intellect_bad_2.png", id: "intellect_bad_2"},
+        {n: "Slow", img: "https://ck3.paradoxwikis.com/images/c/c9/Trait_intellect_bad_1.png", id: "intellect_bad_1"},
+        {n: "Quick", img: "https://ck3.paradoxwikis.com/images/b/b9/Trait_intellect_good_1.png", id: "intellect_good_1"},
+        {n: "Intelligent", img: "https://ck3.paradoxwikis.com/images/8/8c/Trait_intellect_good_2.png", id: "intellect_good_2"},
+        {n: "Genius", img: "https://ck3.paradoxwikis.com/images/6/63/Trait_intellect_good_3.png", id: "intellect_good_3"},
+        {n: "Feeble", img: "https://ck3.paradoxwikis.com/images/8/84/Trait_physique_bad_3.png", id: "physique_bad_3"},
+        {n: "Frail", img: "https://ck3.paradoxwikis.com/images/b/ba/Trait_physique_bad_2.png", id: "physique_bad_2"},
+        {n: "Delicate", img: "https://ck3.paradoxwikis.com/images/3/33/Trait_physique_bad_1.png", id: "physique_bad_1"},
+        {n: "Hale", img: "https://ck3.paradoxwikis.com/images/9/9b/Trait_physique_good_1.png", id: "physique_good_1"},
+        {n: "Robust", img: "https://ck3.paradoxwikis.com/images/1/1a/Trait_physique_good_2.png", id: "physique_good_2"},
+        {n: "Herculean", img: "https://ck3.paradoxwikis.com/images/7/76/Trait_physique_good_3.png", id: "physique_good_3"},
+        {n: "Hideous", img: "https://ck3.paradoxwikis.com/images/6/68/Trait_beauty_bad_3.png", id: "beauty_bad_3"},
+        {n: "Ugly", img: "https://ck3.paradoxwikis.com/images/1/12/Trait_beauty_bad_2.png", id: "beauty_bad_2"},
+        {n: "Homely", img: "https://ck3.paradoxwikis.com/images/2/21/Trait_beauty_bad_1.png", id: "beauty_bad_1"},
+        {n: "Comely", img: "https://ck3.paradoxwikis.com/images/1/15/Trait_beauty_good_1.png", id: "beauty_good_1"},
+        {n: "Pretty", img: "https://ck3.paradoxwikis.com/images/8/8f/Trait_beauty_good_2.png", id: "beauty_good_2"},
+        {n: "Beautiful", img: "https://ck3.paradoxwikis.com/images/e/ed/Trait_beauty_good_3.png", id: "beauty_good_3"}
     ]
 };
+
 
 // Data structure for Barbara's fixed dates and dynasty
 const BARBARA_PRESETS = {
@@ -671,12 +539,7 @@ const BARBARA_PRESETS = {
     '7861178': { startYear: '1178', birth: '1157.1.1', death: '1277.1.1', dynasty: '8661' }  // Based on source 6, 7
 };
 
-// Pre-calculate IDs for the database
-Object.keys(TRAIT_DB).forEach(cat => {
-    TRAIT_DB[cat].forEach(trait => {
-        trait.id = extractIdFromUrl(trait.img);
-    });
-});
+
 
 // New data structure for Easter Egg DNA (copied from original file)
 const EASTER_EGG_DNA_DB = {}; 
@@ -1956,7 +1819,7 @@ function updateBarbaraDatesAndDynasty() {
 
 // Initialize UI with Data
 function initUI() {
-    // Set initial Barbara state
+    // Load Presets
     updateBarbaraDatesAndDynasty();
 
     // Populate Culture Dropdown
@@ -1981,6 +1844,7 @@ function initUI() {
     // Render Traits
     ['education', 'personality', 'congenital'].forEach(cat => {
         const container = document.getElementById(`subtab-${cat}`);
+        container.innerHTML = ''; // Clear existing
         TRAIT_DB[cat].forEach(trait => {
             const el = document.createElement('div');
             el.className = 'trait-item';
@@ -2245,7 +2109,7 @@ function toggleSection(id) {
     arrow.firstElementChild.classList.toggle('fa-chevron-down');
 }
 
-window.onload = initUI;
+window.addEventListener('load', initUI);
 
 </script>
 </body>

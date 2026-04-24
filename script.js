@@ -171,6 +171,107 @@ const congenitalCategories = {
     appearance: ['Hideous', 'Ugly', 'Homely', 'Comely', 'Pretty', 'Handsome', 'Beautiful'],
     fertility: ['Barren', 'Sterile', 'Fecund']
 };
+
+const TRAIT_FALLBACK = {
+    education: [
+        {n: "Diplomacy 1", img: "https://ck3.paradoxwikis.com/images/7/7d/Trait_education_diplomacy_1.png", id: "education_diplomacy_1"},
+        {n: "Diplomacy 2", img: "https://ck3.paradoxwikis.com/images/b/ba/Trait_education_diplomacy_2.png", id: "education_diplomacy_2"},
+        {n: "Diplomacy 3", img: "https://ck3.paradoxwikis.com/images/a/a3/Trait_education_diplomacy_3.png", id: "education_diplomacy_3"},
+        {n: "Diplomacy 4", img: "https://ck3.paradoxwikis.com/images/1/19/Trait_education_diplomacy_4.png", id: "education_diplomacy_4"},
+        {n: "Martial 1", img: "https://ck3.paradoxwikis.com/images/8/8a/Trait_education_martial_1.png", id: "education_martial_1"},
+        {n: "Martial 2", img: "https://ck3.paradoxwikis.com/images/2/25/Trait_education_martial_2.png", id: "education_martial_2"},
+        {n: "Martial 3", img: "https://ck3.paradoxwikis.com/images/8/8b/Trait_education_martial_3.png", id: "education_martial_3"},
+        {n: "Martial 4", img: "https://ck3.paradoxwikis.com/images/1/12/Trait_education_martial_4.png", id: "education_martial_4"},
+        {n: "Stewardship 1", img: "https://ck3.paradoxwikis.com/images/8/89/Trait_education_stewardship_1.png", id: "education_stewardship_1"},
+        {n: "Stewardship 2", img: "https://ck3.paradoxwikis.com/images/7/7d/Trait_education_stewardship_2.png", id: "education_stewardship_2"},
+        {n: "Stewardship 3", img: "https://ck3.paradoxwikis.com/images/9/91/Trait_education_stewardship_3.png", id: "education_stewardship_3"},
+        {n: "Stewardship 4", img: "https://ck3.paradoxwikis.com/images/8/8f/Trait_education_stewardship_4.png", id: "education_stewardship_4"},
+        {n: "Intrigue 1", img: "https://ck3.paradoxwikis.com/images/b/ba/Trait_education_intrigue_1.png", id: "education_intrigue_1"},
+        {n: "Intrigue 2", img: "https://ck3.paradoxwikis.com/images/e/e8/Trait_education_intrigue_2.png", id: "education_intrigue_2"},
+        {n: "Intrigue 3", img: "https://ck3.paradoxwikis.com/images/a/ad/Trait_education_intrigue_3.png", id: "education_intrigue_3"},
+        {n: "Intrigue 4", img: "https://ck3.paradoxwikis.com/images/1/17/Trait_education_intrigue_4.png", id: "education_intrigue_4"},
+        {n: "Learning 1", img: "https://ck3.paradoxwikis.com/images/b/b1/Trait_education_learning_1.png", id: "education_learning_1"},
+        {n: "Learning 2", img: "https://ck3.paradoxwikis.com/images/3/3f/Trait_education_learning_2.png", id: "education_learning_2"},
+        {n: "Learning 3", img: "https://ck3.paradoxwikis.com/images/5/5a/Trait_education_learning_3.png", id: "education_learning_3"},
+        {n: "Learning 4", img: "https://ck3.paradoxwikis.com/images/6/6f/Trait_education_learning_4.png", id: "education_learning_4"}
+    ],
+    personality: [
+        {n: "Ambitious", img: "https://ck3.paradoxwikis.com/images/d/df/Trait_ambitious.png", id: "ambitious"},
+        {n: "Arbitrary", img: "https://ck3.paradoxwikis.com/images/6/67/Trait_arbitrary.png", id: "arbitrary"},
+        {n: "Arrogant", img: "https://ck3.paradoxwikis.com/images/c/c0/Trait_arrogant.png", id: "arrogant"},
+        {n: "Brave", img: "https://ck3.paradoxwikis.com/images/c/c8/Trait_brave.png", id: "brave"},
+        {n: "Callous", img: "https://ck3.paradoxwikis.com/images/d/d1/Trait_callous.png", id: "callous"},
+        {n: "Calm", img: "https://ck3.paradoxwikis.com/images/6/69/Trait_calm.png", id: "calm"},
+        {n: "Chaste", img: "https://ck3.paradoxwikis.com/images/2/26/Trait_chaste.png", id: "chaste"},
+        {n: "Compassionate", img: "https://ck3.paradoxwikis.com/images/5/5c/Trait_compassionate.png", id: "compassionate"},
+        {n: "Content", img: "https://ck3.paradoxwikis.com/images/2/28/Trait_content.png", id: "content"},
+        {n: "Craven", img: "https://ck3.paradoxwikis.com/images/0/04/Trait_craven.png", id: "craven"},
+        {n: "Cynical", img: "https://ck3.paradoxwikis.com/images/c/c8/Trait_cynical.png", id: "cynical"},
+        {n: "Deceitful", img: "https://ck3.paradoxwikis.com/images/2/20/Trait_deceitful.png", id: "deceitful"},
+        {n: "Diligent", img: "https://ck3.paradoxwikis.com/images/4/4a/Trait_diligent.png", id: "diligent"},
+        {n: "Fickle", img: "https://ck3.paradoxwikis.com/images/7/7d/Trait_fickle.png", id: "fickle"},
+        {n: "Forgiving", img: "https://ck3.paradoxwikis.com/images/e/e7/Trait_forgiving.png", id: "forgiving"},
+        {n: "Generous", img: "https://ck3.paradoxwikis.com/images/9/9f/Trait_generous.png", id: "generous"},
+        {n: "Gluttonous", img: "https://ck3.paradoxwikis.com/images/b/b7/Trait_gluttonous.png", id: "gluttonous"},
+        {n: "Greedy", img: "https://ck3.paradoxwikis.com/images/1/19/Trait_greedy.png", id: "greedy"},
+        {n: "Gregarious", img: "https://ck3.paradoxwikis.com/images/3/31/Trait_gregarious.png", id: "gregarious"},
+        {n: "Honest", img: "https://ck3.paradoxwikis.com/images/c/cf/Trait_honest.png", id: "honest"},
+        {n: "Humble", img: "https://ck3.paradoxwikis.com/images/3/37/Trait_humble.png", id: "humble"},
+        {n: "Impatient", img: "https://ck3.paradoxwikis.com/images/4/42/Trait_impatient.png", id: "impatient"},
+        {n: "Just", img: "https://ck3.paradoxwikis.com/images/b/b4/Trait_just.png", id: "just"},
+        {n: "Lazy", img: "https://ck3.paradoxwikis.com/images/a/a7/Trait_lazy.png", id: "lazy"},
+        {n: "Lustful", img: "https://ck3.paradoxwikis.com/images/e/ed/Trait_lustful.png", id: "lustful"},
+        {n: "Paranoid", img: "https://ck3.paradoxwikis.com/images/5/52/Trait_paranoid.png", id: "paranoid"},
+        {n: "Patient", img: "https://ck3.paradoxwikis.com/images/a/af/Trait_patient.png", id: "patient"},
+        {n: "Sadistic", img: "https://ck3.paradoxwikis.com/images/9/90/Trait_sadistic.png", id: "sadistic"},
+        {n: "Shy", img: "https://ck3.paradoxwikis.com/images/2/28/Trait_shy.png", id: "shy"},
+        {n: "Stubborn", img: "https://ck3.paradoxwikis.com/images/4/4e/Trait_stubborn.png", id: "stubborn"},
+        {n: "Temperate", img: "https://ck3.paradoxwikis.com/images/a/a9/Trait_temperate.png", id: "temperate"},
+        {n: "Trusting", img: "https://ck3.paradoxwikis.com/images/f/f0/Trait_trusting.png", id: "trusting"},
+        {n: "Vengeful", img: "https://ck3.paradoxwikis.com/images/4/4a/Trait_vengeful.png", id: "vengeful"},
+        {n: "Wrathful", img: "https://ck3.paradoxwikis.com/images/4/42/Trait_wrathful.png", id: "wrathful"},
+        {n: "Zealous", img: "https://ck3.paradoxwikis.com/images/8/8d/Trait_zealous.png", id: "zealous"},
+        {n: "Eccentric", img: "https://ck3.paradoxwikis.com/images/3/3d/Trait_eccentric.png", id: "eccentric"}
+    ],
+    congenital: [
+        {n: "Albino", img: "https://ck3.paradoxwikis.com/images/b/bb/Trait_albino.png", id: "albino"},
+        {n: "Bleeder", img: "https://ck3.paradoxwikis.com/images/3/36/Trait_bleeder.png", id: "bleeder"},
+        {n: "Club-footed", img: "https://ck3.paradoxwikis.com/images/4/4f/Trait_clubfooted.png", id: "clubfooted"},
+        {n: "Dwarf", img: "https://ck3.paradoxwikis.com/images/c/cc/Trait_dwarf.png", id: "dwarf"},
+        {n: "Fecund", img: "https://ck3.paradoxwikis.com/images/7/72/Trait_fecund.png", id: "fecund"},
+        {n: "Giant", img: "https://ck3.paradoxwikis.com/images/9/99/Trait_giant.png", id: "giant"},
+        {n: "Hunchbacked", img: "https://ck3.paradoxwikis.com/images/d/df/Trait_hunchbacked.png", id: "hunchbacked"},
+        {n: "Lisping", img: "https://ck3.paradoxwikis.com/images/b/b3/Trait_lisping.png", id: "lisping"},
+        {n: "Lunatic", img: "https://ck3.paradoxwikis.com/images/d/d9/Trait_lunatic.png", id: "lunatic"},
+        {n: "Melancholic", img: "https://ck3.paradoxwikis.com/images/1/1c/Trait_depressed.png", id: "depressed"},
+        {n: "Possessed", img: "https://ck3.paradoxwikis.com/images/0/08/Trait_possessed.png", id: "possessed"},
+        {n: "Pure-blooded", img: "https://ck3.paradoxwikis.com/images/d/d4/Trait_pure_blooded.png", id: "pure_blooded"},
+        {n: "Scaly", img: "https://ck3.paradoxwikis.com/images/7/72/Trait_scaly.png", id: "scaly"},
+        {n: "Spindly", img: "https://ck3.paradoxwikis.com/images/3/3f/Trait_spindly.png", id: "spindly"},
+        {n: "Sterile", img: "https://ck3.paradoxwikis.com/images/a/ae/Trait_infertile.png", id: "infertile"},
+        {n: "Stuttering", img: "https://ck3.paradoxwikis.com/images/9/9b/Trait_stuttering.png", id: "stuttering"},
+        {n: "Wheezing", img: "https://ck3.paradoxwikis.com/images/7/7f/Trait_wheezing.png", id: "wheezing"},
+        {n: "Imbecile", img: "https://ck3.paradoxwikis.com/images/7/75/Trait_intellect_bad_3.png", id: "intellect_bad_3"},
+        {n: "Stupid", img: "https://ck3.paradoxwikis.com/images/e/e6/Trait_intellect_bad_2.png", id: "intellect_bad_2"},
+        {n: "Slow", img: "https://ck3.paradoxwikis.com/images/c/c9/Trait_intellect_bad_1.png", id: "intellect_bad_1"},
+        {n: "Quick", img: "https://ck3.paradoxwikis.com/images/b/b9/Trait_intellect_good_1.png", id: "intellect_good_1"},
+        {n: "Intelligent", img: "https://ck3.paradoxwikis.com/images/8/8c/Trait_intellect_good_2.png", id: "intellect_good_2"},
+        {n: "Genius", img: "https://ck3.paradoxwikis.com/images/6/63/Trait_intellect_good_3.png", id: "intellect_good_3"},
+        {n: "Feeble", img: "https://ck3.paradoxwikis.com/images/8/84/Trait_physique_bad_3.png", id: "physique_bad_3"},
+        {n: "Frail", img: "https://ck3.paradoxwikis.com/images/b/ba/Trait_physique_bad_2.png", id: "physique_bad_2"},
+        {n: "Delicate", img: "https://ck3.paradoxwikis.com/images/3/33/Trait_physique_bad_1.png", id: "physique_bad_1"},
+        {n: "Hale", img: "https://ck3.paradoxwikis.com/images/9/9b/Trait_physique_good_1.png", id: "physique_good_1"},
+        {n: "Robust", img: "https://ck3.paradoxwikis.com/images/1/1a/Trait_physique_good_2.png", id: "physique_good_2"},
+        {n: "Herculean", img: "https://ck3.paradoxwikis.com/images/7/76/Trait_physique_good_3.png", id: "physique_good_3"},
+        {n: "Hideous", img: "https://ck3.paradoxwikis.com/images/6/68/Trait_beauty_bad_3.png", id: "beauty_bad_3"},
+        {n: "Ugly", img: "https://ck3.paradoxwikis.com/images/1/12/Trait_beauty_bad_2.png", id: "beauty_bad_2"},
+        {n: "Homely", img: "https://ck3.paradoxwikis.com/images/2/21/Trait_beauty_bad_1.png", id: "beauty_bad_1"},
+        {n: "Comely", img: "https://ck3.paradoxwikis.com/images/1/15/Trait_beauty_good_1.png", id: "beauty_good_1"},
+        {n: "Pretty", img: "https://ck3.paradoxwikis.com/images/8/8f/Trait_beauty_good_2.png", id: "beauty_good_2"},
+        {n: "Beautiful", img: "https://ck3.paradoxwikis.com/images/e/ed/Trait_beauty_good_3.png", id: "beauty_good_3"}
+    ]
+};
+
 const opposingTraits = {
     'Brave': ['Craven'], 'Craven': ['Brave'], 'Calm': ['Wrathful'], 'Wrathful': ['Calm'],
     'Generous': ['Greedy'], 'Greedy': ['Generous'], 'Honest': ['Deceitful'], 'Deceitful': ['Honest'],
@@ -182,29 +283,19 @@ const opposingTraits = {
     'Gregarious': ['Shy'], 'Shy': ['Gregarious'], 'Zealous': ['Cynical'], 'Cynical': ['Zealous'],
     'Content': ['Ambitious'], 'Ambitious': ['Content']
 };
-async function loadData() {
-    try {
-        const congenitalData = await fetch('ck3_congenital_traits.csv').then(res => res.text());
-        const educationData = await fetch('ck3_education_traits.csv').then(res => res.text());
-        const personalityData = await fetch('ck3_personality_traits.csv').then(res => res.text());
-        congenitalTraits = Papa.parse(congenitalData, { header: true, dynamicTyping: true }).data.filter(t => t.trait_name);
-        educationTraits = Papa.parse(educationData, { header: true, dynamicTyping: true }).data.filter(t => t.trait_name);
-        personalityTraits = Papa.parse(personalityData, { header: true, dynamicTyping: true }).data.filter(t => t.trait_name);
-        dataLoaded = true;
-    } catch (error) { console.error('Error loading data:', error); document.getElementById('characterResult').innerHTML = '<div class="error">Error loading trait data.</div>'; }
-}
+
+
 function getTraitCategory(traitName) { for (const [category, traits] of Object.entries(congenitalCategories)) { if (traits.includes(traitName)) return category; } return 'single'; }
 function canAddCongenitalTrait(traitName, selectedCongenitalTraits) { const newCategory = getTraitCategory(traitName); if (newCategory === 'single') return true; return !selectedCongenitalTraits.some(selected => getTraitCategory(selected.trait_name) === newCategory); }
-function getRandomElement(array) { return array[Math.floor(Math.random() * array.length)]; }
+function getRandomElement(array) { if (!array || array.length === 0) return null; return array[Math.floor(Math.random() * array.length)]; }
 function canAddPersonalityTrait(traitName, selectedPersonalityTraits) { const opposing = opposingTraits[traitName] || []; return !selectedPersonalityTraits.some(selected => opposing.includes(selected.trait_name)); }
 function formatCost(cost) { if (cost > 0) return `<span class="positive-cost">+${cost}</span>`; if (cost < 0) return `<span class="negative-cost">${cost}</span>`; return `<span class="zero-cost">0</span>`; }
 
 function generateCharacter() {
-    if (!dataLoaded) {
-        document.getElementById('characterResult').innerHTML = '<div class="loading">Loading trait data...</div>';
-        loadData().then(() => { if (dataLoaded) generateCharacter(); });
-        return;
-    }
+    const congenitalTraits = TRAIT_FALLBACK.congenital.map(t => ({ trait_name: t.n, image_link: t.img, point_cost: 0 }));
+    const educationTraits = TRAIT_FALLBACK.education.map(t => ({ trait_name: t.n, image_link: t.img, point_cost: 0 }));
+    const personalityTraits = TRAIT_FALLBACK.personality.map(t => ({ trait_name: t.n, image_link: t.img, point_cost: 0 }));
+
 
     const TOTAL_POINTS = 400;
     let usedPoints = 106;
