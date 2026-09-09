@@ -1,0 +1,11 @@
+{
+  "devDependencies": {
+    "@neutralinojs/neu": "^11.7.2"
+  },
+  "private": true,
+  "scripts": {
+    "build": "node build.cjs",
+    "start": "neu run",
+    "update-runtime": "neu update"
+  }
+}
